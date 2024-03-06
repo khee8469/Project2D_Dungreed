@@ -1,0 +1,49 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Monster : MonoBehaviour
+{
+    private enum State { Idle, Trace, Attack, Die }
+    [SerializeField] int damage;
+    [SerializeField] int speed;
+    [SerializeField] int hp;
+
+    private State state = State.Idle;
+    
+
+    public void HitDamage(int damage)
+    {
+        Debug.Log("µ¥¹ÌÁö");
+        hp -= damage;
+    }
+    private void Die()
+    {
+        if(hp <= 0)
+        {
+            Debug.Log("»ç¸Á");
+            Destroy(gameObject);
+        }
+    }
+    private void Update()
+    {
+        Die();
+
+        switch (state)
+        {
+            case State.Idle:
+
+                break; 
+            case State.Trace:
+
+                break;
+            case State.Attack:
+
+                break;
+            case State.Die:
+
+                break;
+        }
+    }
+
+}

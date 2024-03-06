@@ -9,6 +9,7 @@ using static UnityEditor.PlayerSettings;
 
 public class PlayerMove : MonoBehaviour
 {
+
     [SerializeField] Rigidbody2D rigid;
     [SerializeField] SpriteRenderer spriteRenderer;
     [SerializeField] Animator animator;
@@ -27,6 +28,7 @@ public class PlayerMove : MonoBehaviour
     [SerializeField] float jumpPower;
     [SerializeField] float dashPower;
     [SerializeField] bool isGround;
+    [SerializeField] bool isDash;
 
 
     public void Awake()
@@ -57,27 +59,30 @@ public class PlayerMove : MonoBehaviour
 
     private void Move()
     {
-        if(rigid.velocity.x < maxSpeed && rigid.velocity.x > -maxSpeed)
+        if (rigid.velocity.x < maxSpeed && rigid.velocity.x > -maxSpeed)
         {
             rigid.AddForce(Vector3.right * moveDir.x * moveSpeed, ForceMode2D.Force);
         }
-       
-        if(moveDir.x > 0 && rigid.velocity.x < -0.1f)
+
+        if (!isDash)
         {
-            rigid.AddForce(Vector3.right * brakeSpeed);       
-        }
-        else if (moveDir.x < 0 && rigid.velocity.x > 0.1f)
-        {
-            rigid.AddForce(Vector3.left * brakeSpeed);
-        }
-        else if (moveDir.x == 0 && rigid.velocity.x > 0.1f)
-        {
-            rigid.AddForce(Vector3.left * brakeSpeed);
-        }
-        else if (moveDir.x == 0 && rigid.velocity.x < -0.1f)
-        {
-            rigid.AddForce(Vector3.right * brakeSpeed);
-        }
+            if (moveDir.x > 0 && rigid.velocity.x < -0.1f)
+            {
+                rigid.AddForce(Vector3.right * brakeSpeed);
+            }
+            else if (moveDir.x < 0 && rigid.velocity.x > 0.1f)
+            {
+                rigid.AddForce(Vector3.left * brakeSpeed);
+            }
+            else if (moveDir.x == 0 && rigid.velocity.x > 0.1f)
+            {
+                rigid.AddForce(Vector3.left * brakeSpeed);
+            }
+            else if (moveDir.x == 0 && rigid.velocity.x < -0.1f)
+            {
+                rigid.AddForce(Vector3.right * brakeSpeed);
+            }
+        } 
     }
 
     private void OnJump(InputValue value)
@@ -90,16 +95,15 @@ public class PlayerMove : MonoBehaviour
 
     private void Jump()
     {
+        //플랫포머 발판에서 내려가기
         if(isGround && Input.GetKey(KeyCode.S))
         {
             gameObject.layer = LayerMask.NameToLayer("Default");
-            Debug.Log(gameObject.layer);
         }
         else if (isGround)
         {
             rigid.AddForce(Vector3.up * jumpPower, ForceMode2D.Impulse);
         }
-        
     }
 
     private void OnMouse(InputValue value)
@@ -122,11 +126,10 @@ public class PlayerMove : MonoBehaviour
         leftRotate.LookAt(cursor);
     }
 
-    private void OnLeftMouse(InputValue value)
-    {
-        //공격
-    }
+    
 
+
+    //대쉬
     private void OnRightMouse(InputValue value)
     {
         dash = cursor.position - transform.position;
@@ -136,14 +139,11 @@ public class PlayerMove : MonoBehaviour
 
     IEnumerator DashGravity()
     {
-        rigid.gravityScale = 0f;
-        Debug.Log(dash.normalized);
-
-        //rigid.velocity = dash.normalized * dashPower;
+        isDash = true;
         rigid.AddForce(dash.normalized * dashPower, ForceMode2D.Impulse);
-        yield return new WaitForSeconds(0.2f);
-        rigid.gravityScale = 1f;
-
+        yield return new WaitForSeconds(0.1f);
+        rigid.velocity *= 0.3f;
+        isDash = false;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -165,17 +165,17 @@ public class PlayerMove : MonoBehaviour
         }
     }
     
-
-    // Start is called before the first frame update
     void Start()
     {
         
     }
 
-    // Update is called once per frame
     void Update()
     {
-        Move();  // 대쉬 좌우 감속 확인필요 
+        Move();
         Mouse();
+
     }
+
+    
 }

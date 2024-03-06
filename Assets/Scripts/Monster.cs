@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Monster : MonoBehaviour
 {
-    private enum State { Idle, Trace, Attack, Die }
+    public enum State { Idle, Trace, Attack, Die }
     [SerializeField] int damage;
     [SerializeField] int speed;
     [SerializeField] int hp;
@@ -44,6 +44,11 @@ public class Monster : MonoBehaviour
 
                 break;
         }
+    }
+
+    public void ChangeState(State state)
+    {
+        this.state = state;
     }
 
 }

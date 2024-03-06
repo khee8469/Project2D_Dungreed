@@ -15,11 +15,15 @@ public class PlayerMove : MonoBehaviour
     [SerializeField] Animator animator;
     [SerializeField] Transform cursor;
     [SerializeField] Transform leftRotate;
+    [SerializeField] GameObject runEffectPrefab;
+    [SerializeField] GameObject jumpEffectPrefab;
+    [SerializeField] Transform effectPos;
 
-    Vector3 moveDir;
+
+    Vector2 moveDir;
     Vector3 mouseMove;
     Vector3 mousePos;
-    Vector3 dash;
+    Vector2 dash;
     [SerializeField] LayerMask groundLayer;
 
     [SerializeField] float maxSpeed;
@@ -39,6 +43,16 @@ public class PlayerMove : MonoBehaviour
     private void OnMove(InputValue value)
     {
         moveDir = value.Get<Vector2>();
+
+        //달리기 먼지
+        if (moveDir.x != 0)
+        {
+            runEffect = StartCoroutine(RunEffect());
+        }
+        else
+        {
+            StopCoroutine(runEffect);
+        }
 
         if (isGround)
         {
@@ -61,28 +75,28 @@ public class PlayerMove : MonoBehaviour
     {
         if (rigid.velocity.x < maxSpeed && rigid.velocity.x > -maxSpeed)
         {
-            rigid.AddForce(Vector3.right * moveDir.x * moveSpeed, ForceMode2D.Force);
+            rigid.AddForce(Vector2.right * moveDir.x * moveSpeed, ForceMode2D.Force);
         }
 
         if (!isDash)
         {
             if (moveDir.x > 0 && rigid.velocity.x < -0.1f)
             {
-                rigid.AddForce(Vector3.right * brakeSpeed);
+                rigid.AddForce(Vector2.right * brakeSpeed);
             }
             else if (moveDir.x < 0 && rigid.velocity.x > 0.1f)
             {
-                rigid.AddForce(Vector3.left * brakeSpeed);
+                rigid.AddForce(Vector2.left * brakeSpeed);
             }
             else if (moveDir.x == 0 && rigid.velocity.x > 0.1f)
             {
-                rigid.AddForce(Vector3.left * brakeSpeed);
+                rigid.AddForce(Vector2.left * brakeSpeed);
             }
             else if (moveDir.x == 0 && rigid.velocity.x < -0.1f)
             {
-                rigid.AddForce(Vector3.right * brakeSpeed);
+                rigid.AddForce(Vector2.right * brakeSpeed);
             }
-        } 
+        }
     }
 
     private void OnJump(InputValue value)
@@ -102,7 +116,9 @@ public class PlayerMove : MonoBehaviour
         }
         else if (isGround)
         {
-            rigid.AddForce(Vector3.up * jumpPower, ForceMode2D.Impulse);
+            rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
+            GameObject effect = Instantiate(jumpEffectPrefab, effectPos.position, effectPos.rotation);
+            Destroy(effect, 0.3f);
         }
     }
 
@@ -113,7 +129,8 @@ public class PlayerMove : MonoBehaviour
 
     private void Mouse()
     {
-        cursor.position = Camera.main.ScreenToWorldPoint(mouseMove)+ mousePos;
+        cursor.position = Camera.main.ScreenToWorldPoint(mouseMove) + mousePos;
+
         if(transform.position.x < cursor.position.x)
         {
             transform.localScale = new Vector3(1, 1, 1);
@@ -123,6 +140,9 @@ public class PlayerMove : MonoBehaviour
             transform.localScale = new Vector3(-1, 1, 1);
         }
 
+        /*Vector2 dir = (cursor.position - transform.position).normalized;
+        leftRotate.right = dir;*/
+        //LookAt은 z축 기준으로 바라본다.
         leftRotate.LookAt(cursor);
     }
 
@@ -133,7 +153,7 @@ public class PlayerMove : MonoBehaviour
     private void OnRightMouse(InputValue value)
     {
         dash = cursor.position - transform.position;
-        rigid.velocity = Vector3.zero;
+        rigid.velocity = Vector2.zero;
         StartCoroutine(DashGravity());
     }
 
@@ -144,6 +164,17 @@ public class PlayerMove : MonoBehaviour
         yield return new WaitForSeconds(0.1f);
         rigid.velocity *= 0.3f;
         isDash = false;
+    }
+
+    Coroutine runEffect;
+    IEnumerator RunEffect()
+    {
+        while (true)
+        {
+            GameObject effect = Instantiate(runEffectPrefab, effectPos.position, Quaternion.LookRotation(moveDir));
+            yield return new WaitForSeconds(0.5f);
+            Destroy(effect);
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

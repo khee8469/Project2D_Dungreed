@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -16,7 +17,7 @@ public class PlayerMove : MonoBehaviour
     [SerializeField] Transform cursor;
     [SerializeField] Transform leftRotate;
     [SerializeField] GameObject runEffectPrefab;
-    [SerializeField] GameObject jumpEffectPrefab;
+    [SerializeField] PooledObject jumpEffectPrefab;
     [SerializeField] Transform effectPos;
 
 
@@ -33,29 +34,31 @@ public class PlayerMove : MonoBehaviour
     [SerializeField] float dashPower;
     [SerializeField] bool isGround;
     [SerializeField] bool isDash;
-
+    Coroutine runEffect;
 
     public void Awake()
     {
         mousePos = new Vector3(0, 0, 10);
+        Manager.Pool.CreatePool(jumpEffectPrefab, 4, 8);
     }
 
     private void OnMove(InputValue value)
     {
         moveDir = value.Get<Vector2>();
 
-        //달리기 먼지
-        if (moveDir.x != 0)
-        {
-            runEffect = StartCoroutine(RunEffect());
-        }
-        else
-        {
-            StopCoroutine(runEffect);
-        }
-
         if (isGround)
         {
+            //먼지 이펙트
+            if (moveDir.x != 0)
+            {
+                runEffectPrefab.SetActive(true);
+            }
+            else
+            {
+                runEffectPrefab.SetActive(false);
+            }
+
+            //달리기 애니
             if (moveDir.x < 0)
             {
                 animator.SetFloat("Run", Mathf.Abs(moveDir.x));
@@ -75,7 +78,8 @@ public class PlayerMove : MonoBehaviour
     {
         if (rigid.velocity.x < maxSpeed && rigid.velocity.x > -maxSpeed)
         {
-            rigid.AddForce(Vector2.right * moveDir.x * moveSpeed, ForceMode2D.Force);
+            rigid.AddForce(Vector2.right * moveDir.x * moveSpeed * Time.deltaTime, ForceMode2D.Force);
+            Debug.Log("움직임");
         }
 
         if (!isDash)
@@ -117,8 +121,7 @@ public class PlayerMove : MonoBehaviour
         else if (isGround)
         {
             rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
-            GameObject effect = Instantiate(jumpEffectPrefab, effectPos.position, effectPos.rotation);
-            Destroy(effect, 0.3f);
+            
         }
     }
 
@@ -130,20 +133,23 @@ public class PlayerMove : MonoBehaviour
     private void Mouse()
     {
         cursor.position = Camera.main.ScreenToWorldPoint(mouseMove) + mousePos;
-
-        if(transform.position.x < cursor.position.x)
+        Debug.Log(cursor.position);
+        if (transform.position.x < cursor.position.x)
         {
-            transform.localScale = new Vector3(1, 1, 1);
+            //x축 반넘어갔을때 반전시키는 모션
+            leftRotate.transform.localScale = new Vector3(1, 1, 1);
+            spriteRenderer.flipX = false;
         }
         else if (transform.position.x > cursor.position.x)
         {
-            transform.localScale = new Vector3(-1, 1, 1);
+            leftRotate.transform.localScale = new Vector3(1, -1, 1);
+            spriteRenderer.flipX = true;
         }
 
-        /*Vector2 dir = (cursor.position - transform.position).normalized;
-        leftRotate.right = dir;*/
+        Vector2 dir = (cursor.position - transform.position).normalized;
+        leftRotate.right = dir;
         //LookAt은 z축 기준으로 바라본다.
-        leftRotate.LookAt(cursor);
+        //leftRotate.LookAt(cursor);
     }
 
     
@@ -164,17 +170,6 @@ public class PlayerMove : MonoBehaviour
         yield return new WaitForSeconds(0.1f);
         rigid.velocity *= 0.3f;
         isDash = false;
-    }
-
-    Coroutine runEffect;
-    IEnumerator RunEffect()
-    {
-        while (true)
-        {
-            GameObject effect = Instantiate(runEffectPrefab, effectPos.position, Quaternion.LookRotation(moveDir));
-            yield return new WaitForSeconds(0.5f);
-            Destroy(effect);
-        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

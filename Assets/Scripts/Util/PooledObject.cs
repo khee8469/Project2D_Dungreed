@@ -23,12 +23,15 @@ public class PooledObject : MonoBehaviour
         Release();
     }
 
+    //프리팹이 생성될때마다 실행
     public void Release()
     {
+        //Pool이 있다면
         if (pool != null)
         {
             pool.ReturnPool(this);
         }
+        //Pool이 없다면 삭제
         else
         {
             Destroy(gameObject);

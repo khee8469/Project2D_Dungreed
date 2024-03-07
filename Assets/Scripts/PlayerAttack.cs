@@ -14,8 +14,8 @@ public class PlayerAttack : MonoBehaviour
     [SerializeField] float effectRange;
     [SerializeField] Transform cursor;
     [SerializeField] Transform leftRotate;
-    [SerializeField] GameObject attactEffectPrefab;
-    [SerializeField] Transform effectPos;
+    [SerializeField] PooledObject attactEffectPrefab;
+
     
 
     float cosAngle;
@@ -24,6 +24,7 @@ public class PlayerAttack : MonoBehaviour
     public void Awake()
     {
         cosAngle = Mathf.Cos(angle * Mathf.Deg2Rad);
+        Manager.Pool.CreatePool(attactEffectPrefab, 4, 8);
     }
 
     //공격
@@ -46,11 +47,12 @@ public class PlayerAttack : MonoBehaviour
             attack = false;
         }
         // 이펙트 방향, 거리
-        Vector2 dir = (cursor.position - transform.position).normalized;
-        GameObject effect = Instantiate(attactEffectPrefab, effectPos.position, Quaternion.LookRotation(dir));
-        effect.transform.up = dir;
-        //풀링으로 대체 필요
-        StartCoroutine(EffectDestroy(effect));
+        Vector3 dir = (cursor.position - transform.position).normalized;
+        float a = Vector2.Angle(transform.right, cursor.position);
+        Debug.Log(a);
+
+        // 검 이펙트 풀링 사용
+        Manager.Pool.GetPool(attactEffectPrefab, transform.position + dir * 2, Quaternion.AxisAngle(Vector3.forward, a)); 
     }
 
     Collider2D[] colliders = new Collider2D[10];

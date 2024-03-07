@@ -36,6 +36,7 @@ public class SceneManager : Singleton<SceneManager>
 
     IEnumerator LoadingRoutine(string sceneName)
     {
+        fade.gameObject.SetActive(true);
         yield return FadeOut();
 
         Manager.Pool.ClearPool();
@@ -63,6 +64,7 @@ public class SceneManager : Singleton<SceneManager>
         Time.timeScale = 1f;
 
         yield return FadeIn();
+        fade.gameObject.SetActive(false);
     }
 
     IEnumerator FadeOut()

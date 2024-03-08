@@ -5,14 +5,11 @@ using UnityEngine.InputSystem;
 
 public class PlayerAttack : MonoBehaviour, IDamagable
 {
-    [SerializeField] bool debug;
-
     [SerializeField] LayerMask targetLayer;
     [SerializeField] float range;
-    [SerializeField] int attacAngle;
+    [SerializeField] int attackAngle;
     [SerializeField] int damage;
     [SerializeField] int hp;
-    [SerializeField] float effectRange;
     [SerializeField] Transform cursor;
     [SerializeField] Transform leftRotate;
     [SerializeField] PooledObject attactEffectPrefab;
@@ -27,7 +24,7 @@ public class PlayerAttack : MonoBehaviour, IDamagable
 
     public void Awake()
     {
-        cosAngle = Mathf.Cos(attacAngle * Mathf.Deg2Rad);
+        cosAngle = Mathf.Cos(attackAngle * Mathf.Deg2Rad);
         Manager.Pool.CreatePool(attactEffectPrefab, 2, 4);
     }
 
@@ -62,6 +59,7 @@ public class PlayerAttack : MonoBehaviour, IDamagable
 
     }
 
+    //공격타겟지정 및 공격
     Collider2D[] colliders = new Collider2D[10];
     private void Attack()
     {
@@ -73,7 +71,6 @@ public class PlayerAttack : MonoBehaviour, IDamagable
             IDamagable monster = colliders[i].GetComponent<IDamagable>();
             if (Vector2.Dot(dir, cursor.position) > cosAngle)
             {
-                Debug.Log("데미지를 주었다.");
                 monster.TakeDamage(damage);
             }
         }
@@ -81,21 +78,17 @@ public class PlayerAttack : MonoBehaviour, IDamagable
 
     public void TakeDamage(int damage)
     {
-        Debug.Log("적한테 맞음");
+        //Debug.Log("적한테 맞음");
         hp -= damage;
 
         if(hp <= 0)
         {
-            Debug.Log("죽음");
+            //Debug.Log("죽음");
         }
     }
 
     private void OnDrawGizmosSelected()
     {
-        if (debug == false)
-        {
-            return;
-        }
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, range);
     }

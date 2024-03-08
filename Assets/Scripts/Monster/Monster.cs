@@ -58,7 +58,26 @@ public class Monster : MonoBehaviour, IDamagable
 
     public void ChangeState(State state)
     {
+        switch (state)
+        {
+            case State.Idle:
+                animator.Play("Idle");
+                break;
+            case State.Trace:
+                animator.Play("Trace");
+                break;
+            case State.Jump:
+                
+                break;
+            case State.Attack:
+                animator.Play("Attack");
+                break;
+            case State.Die:
+                animator.Play("Die");
+                break;
+        }
         this.state = state;
+        
     }
 
     private void IdleState()
@@ -71,12 +90,12 @@ public class Monster : MonoBehaviour, IDamagable
         if ((player.position - transform.position).sqrMagnitude < range * range)
         {
             ChangeState(State.Trace);
-            animator.Play("Trace");
+            //animator.Play("Trace");
         }
         if (hp <= 0)
         {
             ChangeState(State.Die);
-            animator.Play("Die");
+            //animator.Play("Die");
         }
     }
 
@@ -104,14 +123,14 @@ public class Monster : MonoBehaviour, IDamagable
         if ((player.position - transform.position).sqrMagnitude > range * range)
         {
             ChangeState(State.Idle);
-            animator.Play("Idle");
+            //animator.Play("Idle");
         }
 
         //바닥위일때만 공격하기
         if (Vector2.Dot(transform.up, (player.position - transform.position).normalized) > cosRange && (player.position - transform.position).sqrMagnitude < attackRange * attackRange)
         {
             ChangeState(State.Attack);
-            animator.Play("Attack");
+            //animator.Play("Attack");
             //공격딜레이
             StartCoroutine(Attacking());
         }
@@ -119,7 +138,7 @@ public class Monster : MonoBehaviour, IDamagable
         if (hp <= 0)
         {
             ChangeState(State.Die);
-            animator.Play("Die");
+            //animator.Play("Die");
         }
     }
 
@@ -138,14 +157,14 @@ public class Monster : MonoBehaviour, IDamagable
         if (!isAttacking)
         {
             ChangeState(State.Trace);
-            animator.Play("Trace");
+            //animator.Play("Trace");
         }
 
 
         if (hp <= 0)
         {
             ChangeState(State.Die);
-            animator.Play("Die");
+            //animator.Play("Die");
         }
     }
 

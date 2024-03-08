@@ -18,17 +18,17 @@ public class PlayerMove : MonoBehaviour
     [SerializeField] Transform leftRotate;
     [SerializeField] GameObject runEffectPrefab;
     [SerializeField] PooledObject jumpEffectPrefab;
+    [SerializeField] PooledObject dashEffectPrefab;
     [SerializeField] Transform effectPos;
-
-
+    [SerializeField] ParticleSystem ghostTrail;
+    //
     Vector2 moveDir;
     Vector3 mouseMove;
     Vector3 mousePos;
     Vector2 dash;
     [SerializeField] LayerMask groundLayer;
 
-    [SerializeField] float maxSpeed;
-    [SerializeField] float moveSpeed;
+    [SerializeField] float Speed;
     [SerializeField] float brakeSpeed;
     [SerializeField] float jumpPower;
     [SerializeField] float dashPower;
@@ -39,6 +39,7 @@ public class PlayerMove : MonoBehaviour
     {
         mousePos = new Vector3(0, 0, 10);
         Manager.Pool.CreatePool(jumpEffectPrefab, 2, 4);
+        Manager.Pool.CreatePool(dashEffectPrefab, 8, 16);
     }
 
     private void OnMove(InputValue value)
@@ -71,13 +72,17 @@ public class PlayerMove : MonoBehaviour
 
     private void Move()
     {
-        if (rigid.velocity.x < maxSpeed && rigid.velocity.x > -maxSpeed)
-        {
-            rigid.AddForce(Vector2.right * moveDir.x * moveSpeed * Time.deltaTime, ForceMode2D.Force);
-        }
-
         if (!isDash)
         {
+            if (moveDir.x > 0 && rigid.velocity.x < Speed)
+            {
+                rigid.velocity = new Vector2(Speed, rigid.velocity.y);
+            }
+            else if (moveDir.x < 0 && rigid.velocity.x > -Speed)
+            {
+                rigid.velocity = new Vector2(-Speed, rigid.velocity.y);
+            }
+
             if (moveDir.x > 0 && rigid.velocity.x < -0.1f)
             {
                 rigid.AddForce(Vector2.right * brakeSpeed);
@@ -147,22 +152,22 @@ public class PlayerMove : MonoBehaviour
         //leftRotate.LookAt(cursor);
     }
 
-    
-
 
     //´ë½¬
     private void OnRightMouse(InputValue value)
     {
-        dash = cursor.position - transform.position;
+        isDash = true;
+        dash = (cursor.position - transform.position).normalized;
         rigid.velocity = Vector2.zero;
+        ghostTrail.gameObject.SetActive(true);
         StartCoroutine(DashGravity());
     }
 
     IEnumerator DashGravity()
     {
-        isDash = true;
-        rigid.AddForce(dash.normalized * dashPower, ForceMode2D.Impulse);
-        yield return new WaitForSeconds(0.1f);
+        rigid.AddForce(dash * dashPower, ForceMode2D.Impulse);
+        yield return new WaitForSeconds(0.2f);
+        ghostTrail.gameObject.SetActive(false);
         rigid.velocity *= 0.3f;
         isDash = false;
     }
@@ -185,18 +190,10 @@ public class PlayerMove : MonoBehaviour
             isGround = false;
         }
     }
-    
-    void Start()
-    {
-        
-    }
 
     void Update()
     {
         Move();
         Mouse();
-
     }
-
-    
 }

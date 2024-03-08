@@ -90,13 +90,6 @@ public class PlayerAttack : MonoBehaviour, IDamagable
         }
     }
 
-    //풀링전 임시
-    IEnumerator EffectDestroy(GameObject effect)
-    {
-        yield return new WaitForSeconds(0.3f);
-        Destroy(effect);
-    }
-
     private void OnDrawGizmosSelected()
     {
         if (debug == false)

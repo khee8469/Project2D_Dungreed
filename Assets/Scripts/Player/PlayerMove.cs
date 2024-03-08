@@ -34,12 +34,11 @@ public class PlayerMove : MonoBehaviour
     [SerializeField] float dashPower;
     [SerializeField] bool isGround;
     [SerializeField] bool isDash;
-    Coroutine runEffect;
 
     public void Awake()
     {
         mousePos = new Vector3(0, 0, 10);
-        Manager.Pool.CreatePool(jumpEffectPrefab, 4, 8);
+        Manager.Pool.CreatePool(jumpEffectPrefab, 2, 4);
     }
 
     private void OnMove(InputValue value)
@@ -48,28 +47,24 @@ public class PlayerMove : MonoBehaviour
 
         if (isGround)
         {
-            //먼지 이펙트
-            if (moveDir.x != 0)
-            {
-                runEffectPrefab.SetActive(true);
-            }
-            else
-            {
-                runEffectPrefab.SetActive(false);
-            }
-
-            //달리기 애니
             if (moveDir.x < 0)
             {
+                //달리기 애니
                 animator.SetFloat("Run", Mathf.Abs(moveDir.x));
+                //먼지이펙트
+                runEffectPrefab.SetActive(true);
+                effectPos.transform.localScale = new Vector3(1, 1, 1);
             }
             else if (moveDir.x > 0)
             {
                 animator.SetFloat("Run", moveDir.x);
+                runEffectPrefab.SetActive(true);
+                effectPos.transform.localScale = new Vector3(-1, 1, 1);
             }
             else
             {
                 animator.SetFloat("Run", moveDir.x);
+                runEffectPrefab.SetActive(false);
             }
         }
     }
@@ -79,7 +74,6 @@ public class PlayerMove : MonoBehaviour
         if (rigid.velocity.x < maxSpeed && rigid.velocity.x > -maxSpeed)
         {
             rigid.AddForce(Vector2.right * moveDir.x * moveSpeed * Time.deltaTime, ForceMode2D.Force);
-            Debug.Log("움직임");
         }
 
         if (!isDash)
@@ -107,6 +101,7 @@ public class PlayerMove : MonoBehaviour
     {
         if (isGround)
         {
+            Manager.Pool.GetPool(jumpEffectPrefab, effectPos.position, effectPos.rotation);
             Jump();
         }
     }
@@ -116,7 +111,7 @@ public class PlayerMove : MonoBehaviour
         //플랫포머 발판에서 내려가기
         if(isGround && Input.GetKey(KeyCode.S))
         {
-            gameObject.layer = LayerMask.NameToLayer("Default");
+            gameObject.layer = LayerMask.NameToLayer("DownJump");
         }
         else if (isGround)
         {
@@ -133,7 +128,7 @@ public class PlayerMove : MonoBehaviour
     private void Mouse()
     {
         cursor.position = Camera.main.ScreenToWorldPoint(mouseMove) + mousePos;
-        Debug.Log(cursor.position);
+
         if (transform.position.x < cursor.position.x)
         {
             //x축 반넘어갔을때 반전시키는 모션
@@ -176,7 +171,7 @@ public class PlayerMove : MonoBehaviour
     {
         if((1<<collision.gameObject.layer & groundLayer) !=0) 
         {
-            gameObject.layer = LayerMask.NameToLayer("Player");
+            gameObject.layer = LayerMask.NameToLayer("Player"); // 다운점프후에 다시 레이어 변경
             animator.SetBool("Jump", false);
             isGround = true;
         }

@@ -3,14 +3,15 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerAttack : MonoBehaviour
+public class PlayerAttack : MonoBehaviour, IDamagable
 {
     [SerializeField] bool debug;
 
     [SerializeField] LayerMask targetLayer;
     [SerializeField] float range;
-    [SerializeField] int angle;
+    [SerializeField] int attacAngle;
     [SerializeField] int damage;
+    [SerializeField] int hp;
     [SerializeField] float effectRange;
     [SerializeField] Transform cursor;
     [SerializeField] Transform leftRotate;
@@ -19,12 +20,15 @@ public class PlayerAttack : MonoBehaviour
     
 
     float cosAngle;
-    [SerializeField] bool attack;
+    [SerializeField] bool attack;//공격모션 변환용
+
+    Vector2 attactEffectPos;
+    float angle;
 
     public void Awake()
     {
-        cosAngle = Mathf.Cos(angle * Mathf.Deg2Rad);
-        Manager.Pool.CreatePool(attactEffectPrefab, 4, 8);
+        cosAngle = Mathf.Cos(attacAngle * Mathf.Deg2Rad);
+        Manager.Pool.CreatePool(attactEffectPrefab, 2, 4);
     }
 
     //공격
@@ -48,11 +52,14 @@ public class PlayerAttack : MonoBehaviour
         }
         // 이펙트 방향, 거리
         Vector3 dir = (cursor.position - transform.position).normalized;
-        float a = Vector2.Angle(transform.right, cursor.position);
-        Debug.Log(a);
 
         // 검 이펙트 풀링 사용
-        Manager.Pool.GetPool(attactEffectPrefab, transform.position + dir * 2, Quaternion.AxisAngle(Vector3.forward, a)); 
+        PooledObject pooledObject = Manager.Pool.GetPool(attactEffectPrefab, transform.position, transform.rotation);
+
+        // 이펙트 마우스방향으로 회전
+        angle = Mathf.Atan2(cursor.position.y - transform.position.y, cursor.position.x - transform.position.x) * Mathf.Rad2Deg;
+        pooledObject.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);//forward(z축 기준)으로 회전
+
     }
 
     Collider2D[] colliders = new Collider2D[10];
@@ -62,12 +69,24 @@ public class PlayerAttack : MonoBehaviour
         for (int i = 0; i < size; i++)
         {
             Vector2 dir = (colliders[i].transform.position - transform.position).normalized;
-            Debug.Log(dir);
-            Monster monster = colliders[i].GetComponent<Monster>();
+
+            IDamagable monster = colliders[i].GetComponent<IDamagable>();
             if (Vector2.Dot(dir, cursor.position) > cosAngle)
             {
-                monster.HitDamage(damage);
+                Debug.Log("데미지를 주었다.");
+                monster.TakeDamage(damage);
             }
+        }
+    }
+
+    public void TakeDamage(int damage)
+    {
+        Debug.Log("적한테 맞음");
+        hp -= damage;
+
+        if(hp <= 0)
+        {
+            Debug.Log("죽음");
         }
     }
 

@@ -8,14 +8,14 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - GroundChecker
   - Water
   - UI
   - Player
   - Monster
   - Ground
+  - DefaultGround
   - DownJump
-  - 
   - 
   - 
   - 

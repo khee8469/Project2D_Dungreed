@@ -1,4 +1,5 @@
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Monster : MonoBehaviour, IDamagable
@@ -8,12 +9,13 @@ public class Monster : MonoBehaviour, IDamagable
     [SerializeField] int damage;
     [SerializeField] int speed;
     [SerializeField] int hp;
-    [SerializeField] int range;
+    [SerializeField] int findRange;
     [SerializeField] int attackRange;
     [SerializeField] int jumpPower;
     [SerializeField] bool isAttacking;
-    [SerializeField] float angle;
+    [SerializeField] bool isGround;
 
+    [SerializeField] float angle;
     private float cosRange;
 
 
@@ -22,7 +24,10 @@ public class Monster : MonoBehaviour, IDamagable
     [SerializeField] SpriteRenderer spriteRenderer;
     [SerializeField] Animator animator;
 
-    [SerializeField] LayerMask layerMask;
+    [SerializeField] FindGround groundCheck;
+
+    
+
 
 
     private State state = State.Idle;
@@ -58,6 +63,7 @@ public class Monster : MonoBehaviour, IDamagable
 
     public void ChangeState(State state)
     {
+        //상태변환시 애니메이션 출력
         switch (state)
         {
             case State.Idle:
@@ -80,6 +86,8 @@ public class Monster : MonoBehaviour, IDamagable
         
     }
 
+
+
     private void IdleState()
     {
 
@@ -87,22 +95,22 @@ public class Monster : MonoBehaviour, IDamagable
 
 
         //몬스터와 플레이어까지의 거리
-        if ((player.position - transform.position).sqrMagnitude < range * range)
+        if ((player.position - transform.position).sqrMagnitude < findRange * findRange)
         {
             ChangeState(State.Trace);
-            //animator.Play("Trace");
         }
         if (hp <= 0)
         {
             ChangeState(State.Die);
-            //animator.Play("Die");
         }
     }
 
+
+
+
+
     private void TraceState()
     {
-
-
         //Debug.Log("trace");
 
 
@@ -120,17 +128,29 @@ public class Monster : MonoBehaviour, IDamagable
 
 
 
-        if ((player.position - transform.position).sqrMagnitude > range * range)
+
+        //플레이어가 위에있고, 탐색가능하고, 발판이있을때
+        if (isGround && groundCheck.isJump && player.position.y > transform.position.y + 3 && (player.position - transform.position).sqrMagnitude < findRange * findRange)
+        {
+            ChangeState(State.Jump);
+            rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
+        }
+        //플레이어가 아래있고, 탐색가능하고, 발판이있을때
+        else if (isGround && groundCheck.isJump && player.position.y  < transform.position.y && (player.position - transform.position).sqrMagnitude < findRange * findRange)
+        {
+            ChangeState(State.Jump);
+            StartCoroutine(DownJump());
+        }
+
+        if ((player.position - transform.position).sqrMagnitude > findRange * findRange)
         {
             ChangeState(State.Idle);
-            //animator.Play("Idle");
         }
 
         //바닥위일때만 공격하기
         if (Vector2.Dot(transform.up, (player.position - transform.position).normalized) > cosRange && (player.position - transform.position).sqrMagnitude < attackRange * attackRange)
         {
             ChangeState(State.Attack);
-            //animator.Play("Attack");
             //공격딜레이
             StartCoroutine(Attacking());
         }
@@ -138,14 +158,41 @@ public class Monster : MonoBehaviour, IDamagable
         if (hp <= 0)
         {
             ChangeState(State.Die);
-            //animator.Play("Die");
         }
     }
 
+
+
+
+
     private void JumpState()
     {
+        Debug.Log("점프상태");
 
+        
+
+
+        if ((player.position - transform.position).sqrMagnitude < findRange * findRange)
+        {
+            ChangeState(State.Trace);
+        }
+
+        //바닥위일때만 공격하기
+        if (Vector2.Dot(transform.up, (player.position - transform.position).normalized) > cosRange && (player.position - transform.position).sqrMagnitude < attackRange * attackRange)
+        {
+            ChangeState(State.Attack);
+            //공격딜레이
+            StartCoroutine(Attacking());
+        }
+
+        if (hp <= 0)
+        {
+            ChangeState(State.Die);
+        }
     }
+
+
+
 
 
     private void AttackState()
@@ -153,26 +200,27 @@ public class Monster : MonoBehaviour, IDamagable
         //Debug.Log("attack");
 
 
-
+        //공격이 끝나면
         if (!isAttacking)
         {
             ChangeState(State.Trace);
-            //animator.Play("Trace");
         }
-
 
         if (hp <= 0)
         {
             ChangeState(State.Die);
-            //animator.Play("Die");
         }
     }
+
+
+
 
     private void DieState()
     {
         Destroy(gameObject, 0.4f);
         //Debug.Log("죽음");
     }
+
 
     public void TakeDamage(int damage)
     {
@@ -222,10 +270,24 @@ public class Monster : MonoBehaviour, IDamagable
         isAttacking = false;
     }
 
+
+    //바닥인지 판단
+    private void OnCollisionStay2D(Collision2D collision)
+    {
+        isGround = true;
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        isGround = false;
+    }
+
+
+
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, range);
+        Gizmos.DrawWireSphere(transform.position, findRange);
         Gizmos.DrawWireSphere(transform.position, attackRange);
     }
 }

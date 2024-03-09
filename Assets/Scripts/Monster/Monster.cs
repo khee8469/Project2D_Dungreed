@@ -108,7 +108,6 @@ public class Monster : MonoBehaviour, IDamagable
 
 
 
-
     private void TraceState()
     {
         //Debug.Log("trace");
@@ -130,7 +129,7 @@ public class Monster : MonoBehaviour, IDamagable
 
 
         //플레이어가 위에있고, 탐색가능하고, 발판이있을때
-        if (isGround && groundCheck.isJump && player.position.y > transform.position.y + 3 && (player.position - transform.position).sqrMagnitude < findRange * findRange)
+        if (isGround && groundCheck.isJump && player.position.y > transform.position.y + 2 && (player.position - transform.position).sqrMagnitude < findRange * findRange)
         {
             ChangeState(State.Jump);
             rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
@@ -160,7 +159,6 @@ public class Monster : MonoBehaviour, IDamagable
             ChangeState(State.Die);
         }
     }
-
 
 
 

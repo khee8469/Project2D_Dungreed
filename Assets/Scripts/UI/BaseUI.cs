@@ -11,8 +11,10 @@ public class BaseUI : MonoBehaviour
         Bind();
     }
 
+    //
     private void Bind()
     {
+        //
         Transform[] transforms = GetComponentsInChildren<Transform>(true);
         gameObjectDic = new Dictionary<string, GameObject>(transforms.Length * 4);
         foreach (Transform child in transforms)
@@ -28,6 +30,7 @@ public class BaseUI : MonoBehaviour
         }
     }
 
+    //딕셔너리에 저장된 게임오브젝트나 컴포넌트를 불러온다.
     public GameObject GetUI(string name)
     {
         gameObjectDic.TryGetValue(name, out GameObject gameObject);

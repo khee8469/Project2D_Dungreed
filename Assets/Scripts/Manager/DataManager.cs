@@ -2,6 +2,8 @@ using System;
 using System.IO;
 using UnityEngine;
 
+
+//게임 데이터저장용
 public class DataManager : Singleton<DataManager>
 {
     private GameData gameData;

@@ -2,6 +2,8 @@ using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
 
+//공격속도조절, 점프연속으로됨
+
 public class Monster : MonoBehaviour, IDamagable
 {
     public enum State { Idle, Trace, Jump, Attack, Die }
@@ -110,23 +112,32 @@ public class Monster : MonoBehaviour, IDamagable
 
     private void TraceState()
     {
-        //Debug.Log("trace");
-
-
+        Debug.Log("trace");
         Vector3 dir = (player.position - transform.position).normalized;
-        if (dir.x > 0 && (player.position.x - transform.position.x) < attackRange)
+        if (dir.x > 0 && (player.position - transform.position).sqrMagnitude > attackRange * attackRange)
         {
-            transform.Translate(Vector2.right * speed * Time.deltaTime);
+            if (dir.x > 0 && rigid.velocity.x < speed)
+            {
+                rigid.velocity = new Vector2(speed, rigid.velocity.y);
+            }
             spriteRenderer.flipX = false;
         }
-        else if (dir.x < 0 && (player.position.x - transform.position.x) < attackRange)
+        else if (dir.x < 0 && (player.position - transform.position).sqrMagnitude > attackRange * attackRange)
         {
-            transform.Translate(Vector2.left * speed * Time.deltaTime);
+            if (dir.x < 0 && rigid.velocity.x > -speed)
+            {
+                rigid.velocity = new Vector2(-speed, rigid.velocity.y);
+            }
             spriteRenderer.flipX = true;
         }
 
 
 
+
+        if ((player.position - transform.position).sqrMagnitude > findRange * findRange)
+        {
+            ChangeState(State.Idle);
+        }
 
         //플레이어가 위에있고, 탐색가능하고, 발판이있을때
         if (isGround && groundCheck.isJump && player.position.y > transform.position.y + 2 && (player.position - transform.position).sqrMagnitude < findRange * findRange)
@@ -135,22 +146,17 @@ public class Monster : MonoBehaviour, IDamagable
             rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
         }
         //플레이어가 아래있고, 탐색가능하고, 발판이있을때
-        else if (isGround && groundCheck.isJump && player.position.y  < transform.position.y && (player.position - transform.position).sqrMagnitude < findRange * findRange)
+        else if (isGround && groundCheck.isJump && player.position.y < transform.position.y -2 &&  (player.position - transform.position).sqrMagnitude < findRange * findRange)
         {
             ChangeState(State.Jump);
             StartCoroutine(DownJump());
-        }
-
-        if ((player.position - transform.position).sqrMagnitude > findRange * findRange)
-        {
-            ChangeState(State.Idle);
         }
 
         //바닥위일때만 공격하기
         if (Vector2.Dot(transform.up, (player.position - transform.position).normalized) > cosRange && (player.position - transform.position).sqrMagnitude < attackRange * attackRange)
         {
             ChangeState(State.Attack);
-            //공격딜레이
+            //임시 공격쿨타임데이터로 전환필요
             StartCoroutine(Attacking());
         }
 
@@ -165,10 +171,10 @@ public class Monster : MonoBehaviour, IDamagable
 
     private void JumpState()
     {
-        Debug.Log("점프상태");
+        //Debug.Log("점프상태");
+
 
         
-
 
         if ((player.position - transform.position).sqrMagnitude < findRange * findRange)
         {
@@ -195,9 +201,6 @@ public class Monster : MonoBehaviour, IDamagable
 
     private void AttackState()
     {
-        //Debug.Log("attack");
-
-
         //공격이 끝나면
         if (!isAttacking)
         {

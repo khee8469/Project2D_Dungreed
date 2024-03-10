@@ -345,7 +345,7 @@ GameObject:
   m_Component:
   - component: {fileID: 239117654}
   m_Layer: 0
-  m_Name: PlayerRota
+  m_Name: LeftRotate
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -360,7 +360,7 @@ Transform:
   m_GameObject: {fileID: 239117653}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -377,7 +377,7 @@ GameObject:
   m_Component:
   - component: {fileID: 397595734}
   m_Layer: 0
-  m_Name: HandRota
+  m_Name: LeftHandFlip
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -392,7 +392,7 @@ Transform:
   m_GameObject: {fileID: 397595733}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.21, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2505,7 +2505,6 @@ GameObject:
   - component: {fileID: 1064679117}
   - component: {fileID: 1064679119}
   - component: {fileID: 1064679115}
-  - component: {fileID: 1064679120}
   m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
@@ -2595,7 +2594,7 @@ Transform:
   m_GameObject: {fileID: 1064679111}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.97, y: -0.32, z: 0}
+  m_LocalPosition: {x: -2.02, y: -0.97, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2622,22 +2621,31 @@ MonoBehaviour:
   rigid: {fileID: 1064679116}
   spriteRenderer: {fileID: 1064679113}
   animator: {fileID: 1064679112}
-  cursor: {fileID: 1903235735}
   leftRotate: {fileID: 239117654}
-  runEffectPrefab: {fileID: 1655687827}
-  jumpEffectPrefab: {fileID: -5527016134384020476, guid: b0634b82506e58742a3e8d2046df5bbd, type: 3}
+  leftFlip: {fileID: 397595734}
+  ghostTrail: {fileID: 1159100457}
+  attactEffectPrefab: {fileID: 7584219686799906201, guid: 274fc5a1aa252734cb324c4099a17935, type: 3}
   dashEffectPrefab: {fileID: -6002100059864786562, guid: 9b2bf231eda2a8749b9abcef237b3774, type: 3}
   effectPos: {fileID: 1079175631}
-  ghostTrail: {fileID: 1159100457}
+  runEffectPrefab: {fileID: 1655687827}
+  jumpEffectPrefab: {fileID: -5527016134384020476, guid: b0634b82506e58742a3e8d2046df5bbd, type: 3}
   groundLayer:
     serializedVersion: 2
     m_Bits: 768
-  Speed: 10
-  brakeSpeed: 50
-  jumpPower: 20
-  dashPower: 25
+  targetLayer:
+    serializedVersion: 2
+    m_Bits: 128
   isGround: 0
   isDash: 0
+  attack: 0
+  damage: 1
+  hp: 3
+  speed: 10
+  jumpPower: 20
+  dashPower: 25
+  cursor: {fileID: 1903235735}
+  attackAngle: 45
+  attackRange: 3
 --- !u!50 &1064679116
 Rigidbody2D:
   serializedVersion: 4
@@ -2697,7 +2705,7 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: -0.07}
+  m_Offset: {x: 0, y: 0.61}
   m_Size: {x: 0.73, y: 1.21}
   m_Direction: 0
 --- !u!114 &1064679118
@@ -2762,10 +2770,10 @@ BoxCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: -0.65}
+  m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0.5, y: 0.5}
+    pivot: {x: 0.5, y: 0}
     oldSize: {x: 1.0625, y: 1.3125}
     newSize: {x: 1.0625, y: 1.3125}
     adaptiveTilingThreshold: 0.5
@@ -2775,29 +2783,6 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 0.47, y: 0.33}
   m_EdgeRadius: 0
---- !u!114 &1064679120
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1064679111}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 18739ddc128bb724f91b0905d49bbf63, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  targetLayer:
-    serializedVersion: 2
-    m_Bits: 128
-  range: 2.3
-  attackAngle: 45
-  damage: 1
-  hp: 10
-  cursor: {fileID: 1903235735}
-  leftRotate: {fileID: 397595734}
-  attactEffectPrefab: {fileID: 7584219686799906201, guid: 274fc5a1aa252734cb324c4099a17935, type: 3}
-  attack: 0
 --- !u!1 &1079175630
 GameObject:
   m_ObjectHideFlags: 0
@@ -2823,7 +2808,7 @@ Transform:
   m_GameObject: {fileID: 1079175630}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.68830544, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: -1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -7719,8 +7704,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1213734065}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.41328204, y: -0.34047568, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.41328192, y: 0.35000002, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7846,14 +7831,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 1
-  speed: 1
+  speed: 2
   hp: 10
   findRange: 7
   attackRange: 3
   jumpPower: 7
   isAttacking: 0
   isGround: 0
-  angle: 90
+  angle: 95
   player: {fileID: 1064679114}
   rigid: {fileID: 1261974706}
   spriteRenderer: {fileID: 1261974704}
@@ -7891,7 +7876,7 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0.02, y: 0.96}
+  m_Offset: {x: 0.02, y: 0.97}
   m_Size: {x: 1.44, y: 1.9375}
   m_Direction: 0
 --- !u!212 &1261974704
@@ -9197,7 +9182,7 @@ Transform:
   m_GameObject: {fileID: 1514613649}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: 0.13052616, w: 0.9914449}
-  m_LocalPosition: {x: 0.39, y: 0.41, z: 0}
+  m_LocalPosition: {x: 0.48, y: 0.26, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

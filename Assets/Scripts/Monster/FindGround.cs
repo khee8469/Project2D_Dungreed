@@ -10,7 +10,6 @@ public class FindGround : MonoBehaviour
     //위아래 발판이있는지
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log(collision.gameObject.layer);
         //몬스터 위아래에 그라운드 충돌체가 있다면
         if ((1 << collision.gameObject.layer & isjumpLayer) != 0)
         {

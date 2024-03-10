@@ -1,18 +1,16 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class SettingButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField] Text text;
-    [SerializeField] SettingUI settingUiPrefab;
+    [SerializeField] SettingUI settingUIPrefab;
 
     public void Click()
     {
         Debug.Log("¼³Á¤Ã¢");
-        Manager.UI.ShowPopUpUI(settingUiPrefab);
+        Manager.UI.ShowPopUpUI(settingUIPrefab);
     }
 
     public void OnPointerEnter(PointerEventData eventData)

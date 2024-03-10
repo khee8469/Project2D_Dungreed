@@ -29,6 +29,8 @@ public class SceneManager : Singleton<SceneManager>
         return curScene as T;
     }
 
+
+
     public void LoadScene(string sceneName)
     {
         StartCoroutine(LoadingRoutine(sceneName));
@@ -36,28 +38,34 @@ public class SceneManager : Singleton<SceneManager>
 
     IEnumerator LoadingRoutine(string sceneName)
     {
+        //페이드아웃
         fade.gameObject.SetActive(true);
         yield return FadeOut();
 
+        //청소
         Manager.Pool.ClearPool();
         Manager.Sound.StopSFX();
         Manager.UI.ClearPopUpUI();
         Manager.UI.ClearWindowUI();
         Manager.UI.CloseInGameUI();
 
+        //시간 정지
         Time.timeScale = 0f;
+        //로딩바
         loadingBar.gameObject.SetActive(true);
-
+        //비동기 씬로드
         AsyncOperation oper = UnitySceneManager.LoadSceneAsync(sceneName);
+        //씬이 로드될떄까지대기
         while (oper.isDone == false)
         {
             loadingBar.value = oper.progress;
             yield return null;
         }
-
+        //EventSystem 없으면 생성
         Manager.UI.EnsureEventSystem();
-
+        //BaseScene = 현재씬
         BaseScene curScene = GetCurScene();
+        
         yield return curScene.LoadingRoutine();
 
         loadingBar.gameObject.SetActive(false);
@@ -67,6 +75,8 @@ public class SceneManager : Singleton<SceneManager>
         fade.gameObject.SetActive(false);
     }
 
+
+    //페이드 인아웃 코르틴
     IEnumerator FadeOut()
     {
         float rate = 0;
@@ -80,7 +90,6 @@ public class SceneManager : Singleton<SceneManager>
             yield return null;
         }
     }
-
     IEnumerator FadeIn()
     {
         float rate = 0;

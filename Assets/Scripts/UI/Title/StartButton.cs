@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -7,10 +5,11 @@ using UnityEngine.UI;
 public class StartButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField] Text text;
+    [SerializeField] StartUI startUIPrefab;
 
     public void Click()
     {
-        Debug.Log("∑ŒµÂUI√¢");
+        Manager.UI.ShowPopUpUI(startUIPrefab);
     }
 
     public void OnPointerEnter(PointerEventData eventData)

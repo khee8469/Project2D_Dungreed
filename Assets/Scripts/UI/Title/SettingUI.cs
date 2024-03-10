@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.UI;
 
 public class SettingUI : PopUpUI
@@ -14,6 +11,6 @@ public class SettingUI : PopUpUI
         GetUI<Button>("SettingExitButton").onClick.AddListener(Close);  // PopUpUI의 Close사용
     }
 
-    
+
     //버튼 추가
 }

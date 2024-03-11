@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -15,6 +14,9 @@ public class PlayerMove : MonoBehaviour, IDamagable
     [SerializeField] Animator animator;
     [SerializeField] Transform leftRotate;
     [SerializeField] Transform leftFlip;
+    [SerializeField] float angle;
+    [SerializeField] Vector2 perp;
+    [SerializeField] bool isSlope;
 
     [Header("Effect")]
     [SerializeField] ParticleSystem ghostTrail;
@@ -46,7 +48,8 @@ public class PlayerMove : MonoBehaviour, IDamagable
     [SerializeField] int attackAngle;
     [SerializeField] float attackRange;
     float cosAngle;
-    float angle;
+    float effectAngle;
+
 
     State state = State.Idle; // 초기상태
     Vector2 moveDir;  // 방향입력
@@ -66,6 +69,44 @@ public class PlayerMove : MonoBehaviour, IDamagable
 
     void Update()
     {
+        //rigid의 x와 회전값을 정지시킴
+        if (moveDir.x == 0)          //0001(1) |  0100(4) = 0101(5)
+            rigid.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
+        else
+        {
+            rigid.constraints = RigidbodyConstraints2D.FreezeRotation;
+        }
+        //플레이어의 아래 레이어의 정보를 가져옴
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, attackRange, groundLayer);
+
+        if (hit != null)
+        {
+            //매개변수의 반시계방향으로 90돌아간 벡터를 반환
+            perp = Vector2.Perpendicular(hit.normal).normalized;
+            //RaycastHit2D의 충돌지점의 법선벡터 nomal과 Vector2.up 사이 각도
+            angle = Vector2.Angle(hit.normal, Vector2.up);
+
+            if (angle != 0) // 언덕
+            {
+                isSlope = true;
+            }
+            else // 평지
+            {
+                isSlope = false;
+            }
+        }
+
+
+        Debug.DrawLine(hit.point, hit.point + perp, Color.red);
+        Debug.DrawLine(hit.point, hit.point + hit.normal, Color.blue);
+
+        if (isSlope && isGround)
+        {                 //Perpendicular값이 -x값을 반환하기 때문에 -1을 곱해준다.
+            rigid.velocity = perp * -1
+        }
+
+
+
         Mouse();
         switch (state)
         {
@@ -113,7 +154,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
 
     private void IdleState()
     {
-        //Debug.Log("idle");
+        Debug.Log("idle");
 
 
 
@@ -147,7 +188,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
 
     private void RunState()
     {
-        //Debug.Log("Run");
+        Debug.Log("Run");
 
         Move();
         MoveEffect();
@@ -182,13 +223,15 @@ public class PlayerMove : MonoBehaviour, IDamagable
 
     private void JumpState()
     {
-        Debug.Log("점프상태");
         Move(); // 점프상태일때 속도 조절
+        Debug.Log("jump");
 
 
 
-        if (moveDir.x == 0 && isGround)
-        {
+
+        Debug.Log(rigid.velocity.y);
+        if (moveDir.x == 0 && isGround && rigid.velocity.y < 0.01f) //점프시 벽에 부딪혀 떨어지는거 방지,
+        {                                                           //오차로 떨어질떄 0보다 큰경우가 있어서 0.01
             rigid.velocity = Vector2.zero;
             ChangeState(State.Idle);
         }
@@ -259,17 +302,17 @@ public class PlayerMove : MonoBehaviour, IDamagable
                 rigid.velocity = new Vector2(-speed, rigid.velocity.y);
             }
         }
-        
+
         //점프중일때
         if (!isGround)
         {
             if (moveDir.x > 0 && rigid.velocity.x < speed)
             {
-                rigid.AddForce(Vector2.right * speed*2, ForceMode2D.Force);
+                rigid.AddForce(Vector2.right * speed * 2, ForceMode2D.Force);
             }
             else if (moveDir.x < 0 && rigid.velocity.x > -speed)
             {
-                rigid.AddForce(Vector2.left * speed*2 , ForceMode2D.Force);
+                rigid.AddForce(Vector2.left * speed * 2, ForceMode2D.Force);
             }
         }
     }
@@ -337,7 +380,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
 
         //right방향이 마우스방향을 바라보게하기
         Vector2 dir = (cursor.position - leftRotate.position).normalized;
-        leftRotate.right = dir; 
+        leftRotate.right = dir;
     }
 
 
@@ -365,8 +408,8 @@ public class PlayerMove : MonoBehaviour, IDamagable
         PooledObject pooledObject = Manager.Pool.GetPool(attactEffectPrefab, leftRotate.position, leftRotate.rotation);
 
         // 이펙트 마우스방향으로 회전
-        angle = Mathf.Atan2(cursor.position.y - leftRotate.position.y, cursor.position.x - leftRotate.position.x) * Mathf.Rad2Deg;
-        pooledObject.transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);//forward(z축 기준)으로 회전
+        effectAngle = Mathf.Atan2(cursor.position.y - leftRotate.position.y, cursor.position.x - leftRotate.position.x) * Mathf.Rad2Deg;
+        pooledObject.transform.rotation = Quaternion.AngleAxis(effectAngle, Vector3.forward);//forward(z축 기준)으로 회전
 
     }
     //공격타겟지정 및 공격
@@ -408,7 +451,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
 
 
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerStay2D(Collider2D collision) // 언덕 미끄러짐 Stay로바꾸니 괜찮아짐
     {
         if ((1 << collision.gameObject.layer & groundLayer) != 0)
         {

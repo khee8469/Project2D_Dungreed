@@ -13,7 +13,7 @@ TagManager:
   - UI
   - Player
   - Monster
-  - Ground
+  - PlatformGround
   - DefaultGround
   - DownJump
   - 
@@ -43,6 +43,9 @@ TagManager:
     locked: 0
   - name: Ground
     uniqueID: 117590697
+    locked: 0
+  - name: Monster
+    uniqueID: 2397272325
     locked: 0
   - name: Player
     uniqueID: 3453148985

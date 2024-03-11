@@ -12,6 +12,11 @@ public class EndButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandle
     public void Click()
     {
         Debug.Log("게임종료");
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false; // 디버깅중 종료
+#else
+        Application.Quit(); // 게임빌드시 종료
+#endif
     }
 
     public void OnPointerEnter(PointerEventData eventData)

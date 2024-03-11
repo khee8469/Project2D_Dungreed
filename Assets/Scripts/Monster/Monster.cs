@@ -11,6 +11,7 @@ public class Monster : MonoBehaviour, IDamagable
     [SerializeField] int damage;
     [SerializeField] int speed;
     [SerializeField] int hp;
+    [SerializeField] float jumpCoolTime;
     [SerializeField] int findRange;
     [SerializeField] int attackRange;
     [SerializeField] int jumpPower;
@@ -93,7 +94,7 @@ public class Monster : MonoBehaviour, IDamagable
     private void IdleState()
     {
 
-        Debug.Log("idle");
+        //Debug.Log("idle");
 
 
         //몬스터와 플레이어까지의 거리
@@ -112,7 +113,7 @@ public class Monster : MonoBehaviour, IDamagable
 
     private void TraceState()
     {
-        Debug.Log("trace");
+        //Debug.Log("trace");
         Vector3 dir = (player.position - transform.position).normalized;
         if (dir.x > 0 && (player.position - transform.position).sqrMagnitude > attackRange * attackRange)
         {
@@ -140,13 +141,13 @@ public class Monster : MonoBehaviour, IDamagable
         }
 
         //플레이어가 위에있고, 탐색가능하고, 발판이있을때
-        if (isGround && groundCheck.isJump && player.position.y > transform.position.y + 2 && (player.position - transform.position).sqrMagnitude < findRange * findRange)
+        if (isGround && groundCheck.isJump && player.position.y > transform.position.y + 1 && (player.position - transform.position).sqrMagnitude < findRange * findRange)
         {
             ChangeState(State.Jump);
             rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
         }
         //플레이어가 아래있고, 탐색가능하고, 발판이있을때
-        else if (isGround && groundCheck.isJump && player.position.y < transform.position.y -2 &&  (player.position - transform.position).sqrMagnitude < findRange * findRange)
+        else if (isGround && groundCheck.isJump && player.position.y < transform.position.y -1 &&  (player.position - transform.position).sqrMagnitude < findRange * findRange)
         {
             ChangeState(State.Jump);
             StartCoroutine(DownJump());

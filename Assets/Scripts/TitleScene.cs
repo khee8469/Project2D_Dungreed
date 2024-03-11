@@ -7,8 +7,10 @@ using static System.Net.Mime.MediaTypeNames;
 
 public class TitleScene : BaseScene
 {
+
     public void GameSceneLoad()
     {
+        Manager.UI.ClearPopUpUI();
         Manager.Scene.LoadScene("MainGame");
     }
 

@@ -29,6 +29,14 @@ public class SceneManager : Singleton<SceneManager>
         return curScene as T;
     }
 
+    //Å×½ºÆ®¿ë
+    /*private void Update()
+    {
+        if(Input.GetKeyDown(KeyCode.Space))
+        {
+            Debug.Log($"ÇöÀç ¾À : {GetCurScene()}");
+        }
+    }*/
 
 
     public void LoadScene(string sceneName)
@@ -65,7 +73,6 @@ public class SceneManager : Singleton<SceneManager>
         Manager.UI.EnsureEventSystem();
         //BaseScene = ÇöÀç¾À
         BaseScene curScene = GetCurScene();
-        
         yield return curScene.LoadingRoutine();
 
         loadingBar.gameObject.SetActive(false);

@@ -2154,6 +2154,14 @@ PrefabInstance:
       propertyPath: frontRayPoint
       value: 
       objectReference: {fileID: 479617817}
+    - target: {fileID: 6602493225761388179, guid: 3ecb71de4d17b6146a24072811b0fb2f, type: 3}
+      propertyPath: m_Size.x
+      value: 0.88
+      objectReference: {fileID: 0}
+    - target: {fileID: 6602493225761388179, guid: 3ecb71de4d17b6146a24072811b0fb2f, type: 3}
+      propertyPath: m_Size.y
+      value: 0.54
+      objectReference: {fileID: 0}
     - target: {fileID: 6894364155365200381, guid: 3ecb71de4d17b6146a24072811b0fb2f, type: 3}
       propertyPath: m_Material
       value: 

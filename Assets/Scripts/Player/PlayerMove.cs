@@ -341,6 +341,10 @@ public class PlayerMove : MonoBehaviour, IDamagable
         if (isSlope && isGround && state == State.Run && angle < maxAngle)
         {                 //Perpendicular값이 -x값을 반환하기 때문에 -1을 곱해준다.
             Debug.Log("언덕");
+            /*if (hit && rigid.velocity.y < 0) 
+            {
+                transform.position = new Vector2(transform.position.x, hit.point.y);
+            }*/
             rigid.velocity = moveDir.x * perp * -1 * speed;
         }
     }

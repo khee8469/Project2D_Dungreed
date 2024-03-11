@@ -17,6 +17,9 @@ public class PlayerMove : MonoBehaviour, IDamagable
     [SerializeField] float angle;
     [SerializeField] Vector2 perp;
     [SerializeField] bool isSlope;
+    [SerializeField] float maxAngle;
+    [SerializeField] Transform frontRayPoint;
+    [SerializeField] Transform frontCheak;
 
     [Header("Effect")]
     [SerializeField] ParticleSystem ghostTrail;
@@ -69,45 +72,9 @@ public class PlayerMove : MonoBehaviour, IDamagable
 
     void Update()
     {
-        //rigid의 x와 회전값을 정지시킴
-        if (moveDir.x == 0)          //0001(1) |  0100(4) = 0101(5)
-            rigid.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
-        else
-        {
-            rigid.constraints = RigidbodyConstraints2D.FreezeRotation;
-        }
-        //플레이어의 아래 레이어의 정보를 가져옴
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, attackRange, groundLayer);
-
-        if (hit != null)
-        {
-            //매개변수의 반시계방향으로 90돌아간 벡터를 반환
-            perp = Vector2.Perpendicular(hit.normal).normalized;
-            //RaycastHit2D의 충돌지점의 법선벡터 nomal과 Vector2.up 사이 각도
-            angle = Vector2.Angle(hit.normal, Vector2.up);
-
-            if (angle != 0) // 언덕
-            {
-                isSlope = true;
-            }
-            else // 평지
-            {
-                isSlope = false;
-            }
-        }
-
-
-        Debug.DrawLine(hit.point, hit.point + perp, Color.red);
-        Debug.DrawLine(hit.point, hit.point + hit.normal, Color.blue);
-
-        if (isSlope && isGround)
-        {                 //Perpendicular값이 -x값을 반환하기 때문에 -1을 곱해준다.
-            rigid.velocity = perp * -1
-        }
-
-
-
         Mouse();
+        SlopeMove();
+
         switch (state)
         {
             case State.Idle:
@@ -128,6 +95,8 @@ public class PlayerMove : MonoBehaviour, IDamagable
         }
     }
 
+    
+
     public void ChangeState(State state)
     {
         //상태변환시 애니메이션 출력
@@ -143,6 +112,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
                 animator.SetBool("Jump", true);
                 break;
             case State.Dash:
+                runEffectPrefab.SetActive(false);
                 StartCoroutine(DashGravity());
                 break;
             case State.Die:
@@ -154,7 +124,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
 
     private void IdleState()
     {
-        Debug.Log("idle");
+        //Debug.Log("idle");
 
 
 
@@ -188,7 +158,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
 
     private void RunState()
     {
-        Debug.Log("Run");
+        //Debug.Log("Run");
 
         Move();
         MoveEffect();
@@ -224,12 +194,12 @@ public class PlayerMove : MonoBehaviour, IDamagable
     private void JumpState()
     {
         Move(); // 점프상태일때 속도 조절
-        Debug.Log("jump");
+        //Debug.Log("jump");
+        
 
 
 
 
-        Debug.Log(rigid.velocity.y);
         if (moveDir.x == 0 && isGround && rigid.velocity.y < 0.01f) //점프시 벽에 부딪혀 떨어지는거 방지,
         {                                                           //오차로 떨어질떄 0보다 큰경우가 있어서 0.01
             rigid.velocity = Vector2.zero;
@@ -257,7 +227,11 @@ public class PlayerMove : MonoBehaviour, IDamagable
     {
         Debug.Log("대시상태");
 
-
+        /*if (!isDash && isGround && moveDir.x ==0)
+        {
+            rigid.velocity = Vector2.zero;
+            ChangeState(State.Idle);
+        }*/
 
         if (!isDash && isGround)
         {
@@ -323,15 +297,69 @@ public class PlayerMove : MonoBehaviour, IDamagable
             //먼지이펙트
             runEffectPrefab.SetActive(true);
             effectPos.transform.localScale = new Vector3(1, 1, 1);
+            frontRayPoint.rotation = Quaternion.Euler(0, 180, 0);
         }
         else if (moveDir.x > 0)
         {
             runEffectPrefab.SetActive(true);
             effectPos.transform.localScale = new Vector3(-1, 1, 1);
+            frontRayPoint.rotation = Quaternion.Euler(0, 0, 0);
         }
         else
         {
             runEffectPrefab.SetActive(false);
+        }
+    }
+
+    private void SlopeMove()
+    {
+        //rigid의 x와 회전값을 정지시켜 언덕 미끄러짐 방지
+        if (!isDash && moveDir.x == 0 && isGround)          //0001(1) |  0100(4) = 0101(5)
+            rigid.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
+        else 
+        {
+            rigid.constraints = RigidbodyConstraints2D.FreezeRotation;
+        }
+        //플레이어의 아래 레이어의 정보를 가져옴
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, attackRange, groundLayer);
+        RaycastHit2D frontHit = Physics2D.Raycast(frontCheak.position, frontCheak.right, 0.1f, groundLayer);
+
+        if (hit || frontHit)
+        {
+            if (frontHit) // 앞 언덕먼저 체크
+                SlopeChk(frontHit);
+            else if (hit)
+                SlopeChk(hit);
+        }
+
+
+        Debug.DrawLine(hit.point, hit.point + perp, Color.red);
+        Debug.DrawLine(hit.point, hit.point + hit.normal, Color.blue);
+        Debug.DrawLine(frontCheak.position, frontCheak.position + frontCheak.right, Color.blue);
+
+        //언덕일때
+        if (isSlope && isGround && state == State.Run && angle < maxAngle)
+        {                 //Perpendicular값이 -x값을 반환하기 때문에 -1을 곱해준다.
+            Debug.Log("언덕");
+            rigid.velocity = moveDir.x * perp * -1 * speed;
+        }
+    }
+
+    //언덕 평면방향, 경사 체크
+    private void SlopeChk(RaycastHit2D hit)
+    {
+        //매개변수의 반시계방향으로 90돌아간 벡터를 반환 == 언덕의 평면
+        perp = Vector2.Perpendicular(hit.normal).normalized;
+        //RaycastHit2D의 충돌지점의 법선벡터 nomal과 Vector2.up 사이 각도 == 언덕의 각도
+        angle = Vector2.Angle(hit.normal, Vector2.up);
+
+        if (angle != 0) // 언덕
+        {
+            isSlope = true;
+        }
+        else // 평지
+        {
+            isSlope = false;
         }
     }
 
@@ -434,6 +462,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
     private void OnRightMouse(InputValue value)
     {
         isDash = true;
+        //moveDir.x = cursor.position.x;
     }
 
     IEnumerator DashGravity()

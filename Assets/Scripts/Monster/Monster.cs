@@ -17,6 +17,7 @@ public class Monster : MonoBehaviour, IDamagable
     [SerializeField] int jumpPower;
     [SerializeField] bool isAttacking;
     [SerializeField] bool isGround;
+    [SerializeField] bool isJump;
 
     [SerializeField] float angle;
     private float cosRange;
@@ -141,10 +142,10 @@ public class Monster : MonoBehaviour, IDamagable
         }
 
         //플레이어가 위에있고, 탐색가능하고, 발판이있을때
-        if (isGround && groundCheck.isJump && player.position.y > transform.position.y + 1 && (player.position - transform.position).sqrMagnitude < findRange * findRange)
+        if (!isJump && isGround && groundCheck.isJump && player.position.y > transform.position.y + 1 && (player.position - transform.position).sqrMagnitude < findRange * findRange)
         {
             ChangeState(State.Jump);
-            rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
+            StartCoroutine(JumpCoolTime());
         }
         //플레이어가 아래있고, 탐색가능하고, 발판이있을때
         else if (isGround && groundCheck.isJump && player.position.y < transform.position.y -1 &&  (player.position - transform.position).sqrMagnitude < findRange * findRange)
@@ -259,6 +260,14 @@ public class Monster : MonoBehaviour, IDamagable
         }
     }
 
+
+    IEnumerator JumpCoolTime()
+    {
+        isJump = true;
+        rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
+        yield return new WaitForSeconds(1f);
+        isJump = false;
+    }
 
     IEnumerator DownJump()
     {

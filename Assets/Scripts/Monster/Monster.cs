@@ -93,7 +93,7 @@ public class Monster : MonoBehaviour, IDamagable
     private void IdleState()
     {
 
-        //Debug.Log("idle");
+        Debug.Log("idle");
 
 
         //몬스터와 플레이어까지의 거리
@@ -201,6 +201,10 @@ public class Monster : MonoBehaviour, IDamagable
 
     private void AttackState()
     {
+        
+
+
+
         //공격이 끝나면
         if (!isAttacking)
         {
@@ -268,6 +272,16 @@ public class Monster : MonoBehaviour, IDamagable
     {
         isAttacking = true;
         yield return new WaitForSeconds(1.2f);
+        //공격범위안에서 뒤로갈떄 방향전환
+        Vector3 dir = (player.position - transform.position).normalized;
+        if (dir.x > 0)
+        {
+            spriteRenderer.flipX = false;
+        }
+        else if (dir.x < 0)
+        {
+            spriteRenderer.flipX = true;
+        }
         isAttacking = false;
     }
 

@@ -9,15 +9,14 @@ public class StartUI : PopUpUI
         base.Awake();
 
         //SettingExitButton버튼 클릭시 Close 함수 발동하게 설정
-        /*GetUI<Button>("Load1Button").onClick.AddListener(GameLoad);
+        GetUI<Button>("Load1Button").onClick.AddListener(GameLoad);
         GetUI<Button>("Load2Button").onClick.AddListener(GameLoad);
-        GetUI<Button>("Load3Button").onClick.AddListener(GameLoad);*/
+        GetUI<Button>("Load3Button").onClick.AddListener(GameLoad);
         GetUI<Button>("StartExitButton").onClick.AddListener(Close);
     }
 
-    /*public void GameLoad()
+    public void GameLoad()
     {
-        Manager.UI.ClosePopUpUI();
         Manager.Scene.LoadScene("MainGame");
-    }*/
+    }
 }

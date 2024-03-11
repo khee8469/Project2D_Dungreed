@@ -49,7 +49,6 @@ public class SceneManager : Singleton<SceneManager>
         //페이드아웃
         fade.gameObject.SetActive(true);
         yield return FadeOut();
-
         //청소
         Manager.Pool.ClearPool();
         Manager.Sound.StopSFX();
@@ -92,7 +91,7 @@ public class SceneManager : Singleton<SceneManager>
 
         while (rate <= 1)
         {
-            rate += Time.deltaTime / fadeTime;
+            rate += Time.unscaledDeltaTime / fadeTime;
             fade.color = Color.Lerp(fadeInColor, fadeOutColor, rate);
             yield return null;
         }
@@ -105,7 +104,7 @@ public class SceneManager : Singleton<SceneManager>
 
         while (rate <= 1)
         {
-            rate += Time.deltaTime / fadeTime;
+            rate += Time.unscaledDeltaTime / fadeTime;
             fade.color = Color.Lerp(fadeOutColor, fadeInColor, rate);
             yield return null;
         }

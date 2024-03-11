@@ -61,7 +61,6 @@ public class PlayerMove : MonoBehaviour, IDamagable
         mousePos = new Vector3(0, 0, 10);
         cosAngle = Mathf.Cos(attackAngle * Mathf.Deg2Rad);
         Manager.Pool.CreatePool(jumpEffectPrefab, 2, 4);
-        Manager.Pool.CreatePool(dashEffectPrefab, 8, 16);
         Manager.Pool.CreatePool(attactEffectPrefab, 2, 4);
     }
 
@@ -114,7 +113,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
 
     private void IdleState()
     {
-        Debug.Log("idle");
+        //Debug.Log("idle");
 
 
 
@@ -148,7 +147,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
 
     private void RunState()
     {
-        Debug.Log("Run");
+        //Debug.Log("Run");
 
         Move();
         MoveEffect();
@@ -405,6 +404,9 @@ public class PlayerMove : MonoBehaviour, IDamagable
         rigid.velocity *= 0.3f;
         isDash = false;
     }
+
+
+
 
     private void OnTriggerEnter2D(Collider2D collision)
     {

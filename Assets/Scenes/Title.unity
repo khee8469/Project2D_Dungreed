@@ -1643,8 +1643,8 @@ MonoBehaviour:
   children:
   - {fileID: 319661866}
   - {fileID: 1230750874}
-  scrollSpeed: 1
-  offset: 500
+  scrollSpeed: 0.2
+  offset: 3840
 --- !u!114 &1372783219
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1821,8 +1821,8 @@ MonoBehaviour:
   - {fileID: 645897838}
   - {fileID: 299832602}
   - {fileID: 238135184}
-  scrollSpeed: 1
-  offset: 500
+  scrollSpeed: 0.5
+  offset: 2800
 --- !u!114 &1516352513
 MonoBehaviour:
   m_ObjectHideFlags: 0

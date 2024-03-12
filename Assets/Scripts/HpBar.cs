@@ -8,7 +8,7 @@ public class HpBar : MonoBehaviour
     protected float curHealth; //* 현재 체력
     public float maxHealth; //* 최대 체력
     public Slider HpBarSlider;
-
+    [SerializeField] private Image barImage;
 
     public void SetHp(float amount) //*Hp설정
     {
@@ -33,6 +33,19 @@ public class HpBar : MonoBehaviour
         if (curHealth <= 0)
         {
             //* 체력이 0 이하라 죽음
+        }
+    }
+
+    
+
+    private void ChangeHealthBarAmount(float amount) //* HP 게이지 변경 
+    {
+        barImage.fillAmount = amount;
+
+        //* HP가 0이거나 꽉차면 HP바 숨기기
+        if (barImage.fillAmount == 0f || barImage.fillAmount == 1f)
+        {
+            Hide();
         }
     }
 }

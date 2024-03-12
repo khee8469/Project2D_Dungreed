@@ -14,7 +14,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
     [SerializeField] Animator animator;
     [SerializeField] Transform leftRotate;
     [SerializeField] Transform leftFlip;
-    [SerializeField] float angle;
+    [SerializeField] float slopeCheak;
     [SerializeField] Vector2 perp;
     [SerializeField] bool isSlope;
     [SerializeField] float maxAngle;
@@ -37,6 +37,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
     [SerializeField] bool isGround;
     [SerializeField] bool isDash;
     [SerializeField] bool attack;//공격모션 변환용
+    [SerializeField] bool jumping;
 
     [Header("PlayerState")]
     [SerializeField] int damage;
@@ -73,7 +74,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
     void Update()
     {
         Mouse();
-        SlopeMove();
+        Debug.Log(jumping);
 
         switch (state)
         {
@@ -95,7 +96,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
         }
     }
 
-    
+
 
     public void ChangeState(State state)
     {
@@ -124,8 +125,11 @@ public class PlayerMove : MonoBehaviour, IDamagable
 
     private void IdleState()
     {
-        //Debug.Log("idle");
-
+        Debug.Log("idle");
+        if (!isDash && moveDir.x == 0 && isGround)
+            rigid.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
+        else
+            rigid.constraints = RigidbodyConstraints2D.FreezeRotation;
 
 
 
@@ -166,8 +170,6 @@ public class PlayerMove : MonoBehaviour, IDamagable
 
 
 
-
-
         if (moveDir.x == 0 && isGround)
         {
             rigid.velocity = Vector2.zero;
@@ -194,8 +196,8 @@ public class PlayerMove : MonoBehaviour, IDamagable
     private void JumpState()
     {
         Move(); // 점프상태일때 속도 조절
-        //Debug.Log("jump");
-        
+        Debug.Log("jump");
+
 
 
 
@@ -265,6 +267,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
     }
     private void Move()
     {
+        //평지
         if (isGround)
         {
             if (moveDir.x > 0 && rigid.velocity.x < speed)
@@ -289,7 +292,31 @@ public class PlayerMove : MonoBehaviour, IDamagable
                 rigid.AddForce(Vector2.left * speed * 2, ForceMode2D.Force);
             }
         }
+
+        //언덕
+        //플레이어의 아래 레이어의 정보를 가져옴
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 0.3f, groundLayer);
+        RaycastHit2D frontHit = Physics2D.Raycast(frontCheak.position, frontCheak.right, 0.1f, groundLayer);
+
+        if (hit || frontHit)
+        {
+            if (frontHit) // 앞 언덕먼저 체크
+                SlopeChk(frontHit);
+            else if (hit)
+                SlopeChk(hit);
+        }
+        Debug.DrawLine(hit.point, hit.point + perp, Color.red);
+        Debug.DrawLine(hit.point, hit.point + hit.normal, Color.blue);
+        Debug.DrawLine(frontCheak.position, frontCheak.position + frontCheak.right, Color.blue);
+
+        //언덕일때
+        if (!jumping && isGround && isSlope && slopeCheak < maxAngle)
+        {
+            //Perpendicular값이 -x값을 반환하기 때문에 -1을 곱해준다.
+            rigid.velocity = moveDir.x * perp * -1 * speed;
+        }
     }
+
     private void MoveEffect()
     {
         if (moveDir.x < 0)
@@ -311,53 +338,16 @@ public class PlayerMove : MonoBehaviour, IDamagable
         }
     }
 
-    private void SlopeMove()
-    {
-        //rigid의 x와 회전값을 정지시켜 언덕 미끄러짐 방지
-        if (!isDash && moveDir.x == 0 && isGround)          //0001(1) |  0100(4) = 0101(5)
-            rigid.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
-        else 
-        {
-            rigid.constraints = RigidbodyConstraints2D.FreezeRotation;
-        }
-        //플레이어의 아래 레이어의 정보를 가져옴
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, attackRange, groundLayer);
-        RaycastHit2D frontHit = Physics2D.Raycast(frontCheak.position, frontCheak.right, 0.1f, groundLayer);
-
-        if (hit || frontHit)
-        {
-            if (frontHit) // 앞 언덕먼저 체크
-                SlopeChk(frontHit);
-            else if (hit)
-                SlopeChk(hit);
-        }
-
-
-        Debug.DrawLine(hit.point, hit.point + perp, Color.red);
-        Debug.DrawLine(hit.point, hit.point + hit.normal, Color.blue);
-        Debug.DrawLine(frontCheak.position, frontCheak.position + frontCheak.right, Color.blue);
-
-        //언덕일때
-        if (isSlope && isGround && state == State.Run && angle < maxAngle)
-        {                 //Perpendicular값이 -x값을 반환하기 때문에 -1을 곱해준다.
-            Debug.Log("언덕");
-            /*if (hit && rigid.velocity.y < 0) 
-            {
-                transform.position = new Vector2(transform.position.x, hit.point.y);
-            }*/
-            rigid.velocity = moveDir.x * perp * -1 * speed;
-        }
-    }
 
     //언덕 평면방향, 경사 체크
     private void SlopeChk(RaycastHit2D hit)
     {
         //매개변수의 반시계방향으로 90돌아간 벡터를 반환 == 언덕의 평면
         perp = Vector2.Perpendicular(hit.normal).normalized;
-        //RaycastHit2D의 충돌지점의 법선벡터 nomal과 Vector2.up 사이 각도 == 언덕의 각도
-        angle = Vector2.Angle(hit.normal, Vector2.up);
+        //RaycastHit2D의 충돌지점의 법선벡터 nomal과 Vector2.up 사이 각도 == 언덕의 경사도
+        slopeCheak = Vector2.Angle(hit.normal, Vector2.up);
 
-        if (angle != 0) // 언덕
+        if (slopeCheak != 0) // 언덕
         {
             isSlope = true;
         }
@@ -385,7 +375,9 @@ public class PlayerMove : MonoBehaviour, IDamagable
         }
         else if (isGround)
         {
-            rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
+            StartCoroutine(JumpOn());
+            //rigid.velocity = new Vector2(rigid.velocity.x, jumpPower);
+            //rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);  // 언덕올라갈때 문제잇어서 velocity로 교체할까
         }
     }
 
@@ -466,7 +458,6 @@ public class PlayerMove : MonoBehaviour, IDamagable
     private void OnRightMouse(InputValue value)
     {
         isDash = true;
-        //moveDir.x = cursor.position.x;
     }
 
     IEnumerator DashGravity()
@@ -481,7 +472,13 @@ public class PlayerMove : MonoBehaviour, IDamagable
         isDash = false;
     }
 
-
+    IEnumerator JumpOn()
+    {
+        jumping = true;
+        rigid.velocity = new Vector2(rigid.velocity.x, jumpPower);
+        yield return new WaitForSeconds(0.1f);
+        jumping = false;
+    }
 
 
     private void OnTriggerStay2D(Collider2D collision) // 언덕 미끄러짐 Stay로바꾸니 괜찮아짐

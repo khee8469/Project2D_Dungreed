@@ -11,14 +11,15 @@ public class Monster : MonoBehaviour, IDamagable
     [SerializeField] int damage;
     [SerializeField] int speed;
     [SerializeField] int hp;
-    [SerializeField] float jumpCoolTime;
-    [SerializeField] int findRange;
-    [SerializeField] int attackRange;
     [SerializeField] int jumpPower;
+    [SerializeField] float attackCoolTime;
+
     [SerializeField] bool isAttacking;
     [SerializeField] bool isGround;
     [SerializeField] bool isJump;
 
+    [SerializeField] int findRange;
+    [SerializeField] int attackRange;
     [SerializeField] float angle;
     private float cosRange;
 
@@ -44,7 +45,7 @@ public class Monster : MonoBehaviour, IDamagable
 
     private void Update()
     {
-
+        attackCoolTime -= Time.deltaTime;
         switch (state)
         {
             case State.Idle:
@@ -87,7 +88,6 @@ public class Monster : MonoBehaviour, IDamagable
                 break;
         }
         this.state = state;
-        
     }
 
 
@@ -116,11 +116,13 @@ public class Monster : MonoBehaviour, IDamagable
     {
         //Debug.Log("trace");
         Vector3 dir = (player.position - transform.position).normalized;
+        
         if (dir.x > 0 && (player.position - transform.position).sqrMagnitude > attackRange * attackRange)
         {
             if (dir.x > 0 && rigid.velocity.x < speed)
             {
-                rigid.velocity = new Vector2(speed, rigid.velocity.y);
+                //rigid.velocity = new Vector2(speed, rigid.velocity.y);
+                rigid.AddForce(Vector3.right);
             }
             spriteRenderer.flipX = false;
         }
@@ -132,6 +134,25 @@ public class Monster : MonoBehaviour, IDamagable
             }
             spriteRenderer.flipX = true;
         }
+
+        //공격범위안이지만 공격쿨타임일때
+        if (attackCoolTime > 0 && dir.x > 0 && (player.position - transform.position).sqrMagnitude < attackRange * attackRange)
+        {
+            if (dir.x > 0 && rigid.velocity.x < speed)
+            {
+                rigid.velocity = new Vector2(speed, rigid.velocity.y);
+            }
+            spriteRenderer.flipX = false;
+        }
+        else if (attackCoolTime > 0 && dir.x < 0 && (player.position - transform.position).sqrMagnitude < attackRange * attackRange)
+        {
+            if (dir.x < 0 && rigid.velocity.x > -speed)
+            {
+                rigid.velocity = new Vector2(-speed, rigid.velocity.y);
+            }
+            spriteRenderer.flipX = true;
+        }
+
 
 
 
@@ -155,10 +176,9 @@ public class Monster : MonoBehaviour, IDamagable
         }
 
         //바닥위일때만 공격하기
-        if (Vector2.Dot(transform.up, (player.position - transform.position).normalized) > cosRange && (player.position - transform.position).sqrMagnitude < attackRange * attackRange)
+        if (attackCoolTime <0 && Vector2.Dot(transform.up, (player.position - transform.position).normalized) > cosRange && (player.position - transform.position).sqrMagnitude < attackRange * attackRange)
         {
             ChangeState(State.Attack);
-            //임시 공격쿨타임데이터로 전환필요
             StartCoroutine(Attacking());
         }
 
@@ -184,7 +204,7 @@ public class Monster : MonoBehaviour, IDamagable
         }
 
         //바닥위일때만 공격하기
-        if (Vector2.Dot(transform.up, (player.position - transform.position).normalized) > cosRange && (player.position - transform.position).sqrMagnitude < attackRange * attackRange)
+        if (attackCoolTime < 0 && Vector2.Dot(transform.up, (player.position - transform.position).normalized) > cosRange && (player.position - transform.position).sqrMagnitude < attackRange * attackRange)
         {
             ChangeState(State.Attack);
             //공격딜레이
@@ -203,7 +223,7 @@ public class Monster : MonoBehaviour, IDamagable
 
     private void AttackState()
     {
-        
+        //Debug.Log("공격중");
 
 
 
@@ -281,7 +301,8 @@ public class Monster : MonoBehaviour, IDamagable
     IEnumerator Attacking()
     {
         isAttacking = true;
-        yield return new WaitForSeconds(1.2f);
+        attackCoolTime = 3; // 공격쿨타임
+        yield return new WaitForSeconds(1.2f); // 공격모션시간
         //공격범위안에서 뒤로갈떄 방향전환
         Vector3 dir = (player.position - transform.position).normalized;
         if (dir.x > 0)

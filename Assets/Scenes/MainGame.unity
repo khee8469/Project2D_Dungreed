@@ -1336,13 +1336,13 @@ MonoBehaviour:
   damage: 1
   speed: 2
   hp: 10
-  jumpCoolTime: 0
-  findRange: 7
-  attackRange: 3
   jumpPower: 25
+  attackCoolTime: 0
   isAttacking: 0
   isGround: 0
   isJump: 0
+  findRange: 7
+  attackRange: 3
   angle: 95
   player: {fileID: 1064679114}
   rigid: {fileID: 1261974706}
@@ -1423,7 +1423,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1897694971
-  m_SortingLayer: 0
+  m_SortingLayer: 2
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 82f2b6af0d392b24c8e2ea50b06ec6fc, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -2097,11 +2097,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 686579306279521484, guid: 3ecb71de4d17b6146a24072811b0fb2f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -2.02
+      value: -12.18
       objectReference: {fileID: 0}
     - target: {fileID: 686579306279521484, guid: 3ecb71de4d17b6146a24072811b0fb2f, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.97
+      value: 2.68
       objectReference: {fileID: 0}
     - target: {fileID: 686579306279521484, guid: 3ecb71de4d17b6146a24072811b0fb2f, type: 3}
       propertyPath: m_LocalPosition.z
@@ -2157,11 +2157,11 @@ PrefabInstance:
       objectReference: {fileID: 479617817}
     - target: {fileID: 6602493225761388179, guid: 3ecb71de4d17b6146a24072811b0fb2f, type: 3}
       propertyPath: m_Size.x
-      value: 0.88
+      value: 0.67
       objectReference: {fileID: 0}
     - target: {fileID: 6602493225761388179, guid: 3ecb71de4d17b6146a24072811b0fb2f, type: 3}
       propertyPath: m_Size.y
-      value: 0.54
+      value: 0.32
       objectReference: {fileID: 0}
     - target: {fileID: 6894364155365200381, guid: 3ecb71de4d17b6146a24072811b0fb2f, type: 3}
       propertyPath: m_Material

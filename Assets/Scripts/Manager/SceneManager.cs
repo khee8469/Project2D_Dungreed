@@ -29,16 +29,7 @@ public class SceneManager : Singleton<SceneManager>
         return curScene as T;
     }
 
-    //테스트용
-    /*private void Update()
-    {
-        if(Input.GetKeyDown(KeyCode.Space))
-        {
-            Debug.Log($"현재 씬 : {GetCurScene()}");
-        }
-    }*/
-
-
+   
     public void LoadScene(string sceneName)
     {
         StartCoroutine(LoadingRoutine(sceneName));

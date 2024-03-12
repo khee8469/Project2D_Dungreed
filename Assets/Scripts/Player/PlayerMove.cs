@@ -432,9 +432,10 @@ public class PlayerMove : MonoBehaviour, IDamagable
         PooledObject pooledObject = Manager.Pool.GetPool(attactEffectPrefab, leftRotate.position, leftRotate.rotation);
 
         // 이펙트 마우스방향으로 회전
-        effectAngle = Mathf.Atan2(cursor.position.y - leftRotate.position.y, cursor.position.x - leftRotate.position.x) * Mathf.Rad2Deg;
-        pooledObject.transform.rotation = Quaternion.AngleAxis(effectAngle, Vector3.forward);//forward(z축 기준)으로 회전
-
+        Vector2 dir = (cursor.position - leftRotate.position).normalized;
+        leftRotate.transform.right = dir;
+        //effectAngle = Mathf.Atan2(cursor.position.y - leftRotate.position.y, cursor.position.x - leftRotate.position.x) * Mathf.Rad2Deg;
+        //pooledObject.transform.rotation = Quaternion.AngleAxis(effectAngle, Vector3.forward);//forward(z축 기준)으로 회전
     }
     //공격타겟지정 및 공격
     Collider2D[] colliders = new Collider2D[10];

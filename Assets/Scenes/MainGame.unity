@@ -8181,17 +8181,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 265c466ca0ea0a34d8c1185f8da76dc8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 1
-  speed: 2
-  hp: 10
-  jumpPower: 25
+  monsterData: {fileID: 11400000, guid: 7ef2f3f9f3e9d2c40aa3357e440509d6, type: 2}
+  monsterNumber: 0
   attackCoolTime: 0
   isAttacking: 0
   isGround: 0
   isJump: 0
-  findRange: 7
-  attackRange: 3
-  angle: 95
   player: {fileID: 1064679114}
   rigid: {fileID: 1261974706}
   spriteRenderer: {fileID: 1261974704}
@@ -9279,7 +9274,7 @@ MonoBehaviour:
   ghostTrail: {fileID: 372346792}
   dashEffectPrefab: {fileID: -6002100059864786562, guid: 9b2bf231eda2a8749b9abcef237b3774, type: 3}
   effectPos: {fileID: 1822956202}
-  runEffectPrefab: {fileID: 236962791}
+  runEffectPrefab: {fileID: 8607084533681351372, guid: 424edb720efcadc47bd4507ac3a15ca6, type: 3}
   jumpEffectPrefab: {fileID: -5527016134384020476, guid: b0634b82506e58742a3e8d2046df5bbd, type: 3}
   groundLayer:
     serializedVersion: 2

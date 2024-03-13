@@ -2,7 +2,6 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-//점프후 달리는 애니메이션 정지필요
 
 public class PlayerMove : MonoBehaviour, IDamagable
 {
@@ -29,7 +28,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
     //[SerializeField] PooledObject attactEffectPrefab;
     [SerializeField] PooledObject dashEffectPrefab;
     [SerializeField] Transform effectPos;
-    [SerializeField] GameObject runEffectPrefab;
+    [SerializeField] PooledObject runEffectPrefab;
     [SerializeField] PooledObject jumpEffectPrefab;
 
     [Header("LayerMask")]
@@ -40,7 +39,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
     [SerializeField] bool isGround;
     [SerializeField] bool isDash;
     [SerializeField] bool attack;//공격모션 변환용
-    [SerializeField] bool jumping;
+    [SerializeField] bool jumping;  // 언덕에서 점프하기용
 
     [Header("PlayerState")]
     [SerializeField] int hp;
@@ -78,6 +77,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
         mousePos = new Vector3(0, 0, 10);
         cosAngle = Mathf.Cos(itemData.items[equipemntNumber].angleRange * Mathf.Deg2Rad);
         Manager.Pool.CreatePool(jumpEffectPrefab, 2, 4);
+        Manager.Pool.CreatePool(runEffectPrefab, 4, 8);
         //Manager.Pool.CreatePool(itemData.items[equipemntNumber].effect, 2, 4);
     
         
@@ -92,8 +92,9 @@ public class PlayerMove : MonoBehaviour, IDamagable
     void Update()
     {
         Mouse();
-        coolTime += Time.deltaTime;
+        coolTime -= Time.deltaTime;
 
+        //장비 스프라이트 교체
         Item a = itemData.items[equipemntNumber].Weapon;
         equipment.sprite = a.transform.GetComponent<SpriteRenderer>().sprite;
 
@@ -134,7 +135,6 @@ public class PlayerMove : MonoBehaviour, IDamagable
                 animator.SetBool("Jump", true);
                 break;
             case State.Dash:
-                runEffectPrefab.SetActive(false);
                 StartCoroutine(DashGravity());
                 break;
             case State.Die:
@@ -168,9 +168,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
 
         if (isDash)
         {
-            rigid.velocity = Vector2.zero;
             ChangeState(State.Dash);
-
         }
 
         if (hp <= 0)
@@ -248,7 +246,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
 
     private void DashState()
     {
-        Debug.Log("대시상태");
+        //Debug.Log("대시상태");
 
         /*if (!isDash && isGround && moveDir.x ==0)
         {
@@ -270,11 +268,6 @@ public class PlayerMove : MonoBehaviour, IDamagable
         {
             ChangeState(State.Die);
         }
-    }
-
-    private void EquipmentChangeState()
-    {
-
     }
 
 
@@ -348,19 +341,19 @@ public class PlayerMove : MonoBehaviour, IDamagable
         if (moveDir.x < 0)
         {
             //먼지이펙트
-            runEffectPrefab.SetActive(true);
+            
             effectPos.transform.localScale = new Vector3(1, 1, 1);
             frontRayPoint.rotation = Quaternion.Euler(0, 180, 0);
         }
         else if (moveDir.x > 0)
         {
-            runEffectPrefab.SetActive(true);
+            
             effectPos.transform.localScale = new Vector3(-1, 1, 1);
             frontRayPoint.rotation = Quaternion.Euler(0, 0, 0);
         }
         else
         {
-            runEffectPrefab.SetActive(false);
+
         }
     }
 
@@ -437,18 +430,18 @@ public class PlayerMove : MonoBehaviour, IDamagable
     //공격
     private void OnLeftMouse(InputValue value)
     {
-        if(coolTime >= itemData.items[equipemntNumber].coolTime)
+        if(coolTime < 0)
         {
             Attack();
             AttactEffect();
-            coolTime = 0;
+            coolTime = itemData.items[equipemntNumber].coolTime;
         }
     }
 
     private void AttactEffect()
     {
         //좌우로 휘두르는 무기
-        if (equipemntNumber < 4) // 임시 테스트
+        if (true/*equipemntNumber < 4*/) // 임시 테스트
         {
             Debug.Log("좌우무기");
             if (!attack)
@@ -465,13 +458,12 @@ public class PlayerMove : MonoBehaviour, IDamagable
 
 
         
-        //찌르는 무기
+        /*//찌르는 무기  
         else
         {
             //창끝이 앞으로 보게하려고
             leftHand.up = leftRotate.right;
-            
-        }
+        }*/
 
 
         // 이펙트 마우스방향으로 회전

@@ -6,13 +6,14 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "ItemData", menuName = "Data/Item")]  //
 public class ItemData : ScriptableObject
 {
-    public Item prefab;
+    //public Item prefab;
     public ItemInfo[] items;
+
 
     [Serializable]
     public struct ItemInfo
     {
-        public Sprite icon;
+        public Item Weapon;
         public GameObject effect;
         public float effectPlayTime;
         

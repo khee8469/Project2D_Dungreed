@@ -12,26 +12,44 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0439a6792914744ba05328ac96dd160, type: 3}
   m_Name: ItemData
   m_EditorClassIdentifier: 
-  prefab: {fileID: 1408574847231221313, guid: ba98eada09b5793459a8f2cc429b72e1, type: 3}
   items:
-  - icon: {fileID: 0}
+  - Weapon: {fileID: 0}
     effect: {fileID: 0}
+    effectPlayTime: 0
     name: "\uB9E8\uC190"
     damage: 0
     range: 0
     angleRange: 0
     coolTime: 9999
-  - icon: {fileID: 21300000, guid: f99970f6d125879428a941b9ac4442d1, type: 3}
-    effect: {fileID: 0}
+  - Weapon: {fileID: 3317535275803105435, guid: 4e2e604c971666142be1a3d474421fc9, type: 3}
+    effect: {fileID: 2686819939992122431, guid: 274fc5a1aa252734cb324c4099a17935, type: 3}
+    effectPlayTime: 0.1
     name: "\uC20F\uC18C\uB4DC"
     damage: 1
     range: 3
     angleRange: 45
     coolTime: 0.5
-  - icon: {fileID: 21300000, guid: a4e5f5d43f5e95446b5c6502769c9392, type: 3}
-    effect: {fileID: 0}
+  - Weapon: {fileID: 6546585789314871109, guid: f779c68739bb1a749baa703f635b8345, type: 3}
+    effect: {fileID: 2686819939992122431, guid: 274fc5a1aa252734cb324c4099a17935, type: 3}
+    effectPlayTime: 0.1
     name: "\uB871\uC18C\uB4DC"
     damage: 3
     range: 4
     angleRange: 45
+    coolTime: 0.7
+  - Weapon: {fileID: 6830284318699543415, guid: 7827bcb13eb78ff48b881dd1b398ece1, type: 3}
+    effect: {fileID: 2686819939992122431, guid: 274fc5a1aa252734cb324c4099a17935, type: 3}
+    effectPlayTime: 0.1
+    name: "\uB0AB"
+    damage: 4
+    range: 5
+    angleRange: 45
     coolTime: 1
+  - Weapon: {fileID: 9010474773050329561, guid: 509ba8808b75f244c868907bf47ef179, type: 3}
+    effect: {fileID: 4723688529321365910, guid: b3a35c0eec9f15d4187a9a9c793fbcce, type: 3}
+    effectPlayTime: 0.5
+    name: "\uCC3D"
+    damage: 3
+    range: 5
+    angleRange: 45
+    coolTime: 0.5

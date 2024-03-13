@@ -9,13 +9,14 @@ public class PlayerMove : MonoBehaviour, IDamagable
     public enum State { Idle, Run, Jump, Dash, Die }
 
     [SerializeField] ItemData itemData;
-
+    
     [Header("PlayerMotion")]
     [SerializeField] Rigidbody2D rigid;
     [SerializeField] SpriteRenderer spriteRenderer;
     [SerializeField] Animator animator;
     [SerializeField] Transform leftRotate;
     [SerializeField] Transform leftFlip;
+    [SerializeField] Transform leftHand;
     [SerializeField] float slopeCheak;
     [SerializeField] Vector2 perp;
     [SerializeField] bool isSlope;
@@ -42,19 +43,16 @@ public class PlayerMove : MonoBehaviour, IDamagable
     [SerializeField] bool jumping;
 
     [Header("PlayerState")]
-    //[SerializeField] int damage;
     [SerializeField] int hp;
+    [SerializeField] int maxHp;
     [SerializeField] float speed;
-    //[SerializeField] float brakeSpeed;
     [SerializeField] float jumpPower;
     [SerializeField] float dashPower;
 
     [Header("AttackRange")]
     [SerializeField] Transform cursor;
     [SerializeField] int attackAngle;
-    //[SerializeField] float attackRange;
     float cosAngle;
-    float effectAngle;
 
     [Header("Equipment")]
     [SerializeField] int firstEquipment;
@@ -71,31 +69,33 @@ public class PlayerMove : MonoBehaviour, IDamagable
     Vector3 mousePos;  // 마우스 Z값 조정용
     Vector2 dashNormalized; //대쉬방향
 
-    public int GetHp()
-    {
-        return hp;
-    }
-    
+
+
+    //MainScene mainScene; // 퍼즈시 업데이트 정지용
+
     public void Awake()
     {
         mousePos = new Vector3(0, 0, 10);
         cosAngle = Mathf.Cos(itemData.items[equipemntNumber].angleRange * Mathf.Deg2Rad);
         Manager.Pool.CreatePool(jumpEffectPrefab, 2, 4);
         //Manager.Pool.CreatePool(itemData.items[equipemntNumber].effect, 2, 4);
+    
         
     }
 
     private void Start()
     {
-        firstEquipment = 1;   // 1번장비창 넘버
-        secondEquipment = 2;   // 2번장비창 넘버
+        Manager.Game.hpBar.SetHp(hp,maxHp); // hp 설정
+        //mainScene = FindObjectOfType<MainScene>();
     }
 
     void Update()
     {
         Mouse();
         coolTime += Time.deltaTime;
-        equipment.sprite = itemData.items[equipemntNumber].icon;
+
+        Item a = itemData.items[equipemntNumber].Weapon;
+        equipment.sprite = a.transform.GetComponent<SpriteRenderer>().sprite;
 
         switch (state)
         {
@@ -272,10 +272,15 @@ public class PlayerMove : MonoBehaviour, IDamagable
         }
     }
 
+    private void EquipmentChangeState()
+    {
+
+    }
+
 
     private void DieState()
     {
-        //Debug.Log("죽음");
+        Debug.Log("죽음");
         //setactive false로바꾸고 죽은 이미지만 생성해둘까
     }
 
@@ -410,14 +415,14 @@ public class PlayerMove : MonoBehaviour, IDamagable
     {
         cursor.position = Camera.main.ScreenToWorldPoint(mouseMove) + mousePos;
 
-        if (transform.position.x < cursor.position.x)
+        if (transform.position.x < cursor.position.x && equipemntNumber <4) //equipemntNumber <4 임시 창뒤짚힘 방지
         {
             //x축 반넘어갔을때 반전시키는 모션
             leftRotate.transform.localScale = new Vector3(1, 1, 1);
             //플레이어 이미지반전
             spriteRenderer.flipX = false;
         }
-        else if (transform.position.x > cursor.position.x)
+        else if (transform.position.x > cursor.position.x && equipemntNumber < 4)
         {
             leftRotate.transform.localScale = new Vector3(1, -1, 1);
             spriteRenderer.flipX = true;
@@ -440,24 +445,39 @@ public class PlayerMove : MonoBehaviour, IDamagable
         }
     }
 
-    public float test;
     private void AttactEffect()
     {
-        if (!attack)
+        //좌우로 휘두르는 무기
+        if (equipemntNumber < 4) // 임시 테스트
         {
-            leftFlip.localScale = new Vector3(1, -1, 1);
-            attack = true;
+            Debug.Log("좌우무기");
+            if (!attack)
+            {
+                leftFlip.localScale = new Vector3(1, -1, 1);
+                attack = true;
+            }
+            else if (attack)
+            {
+                leftFlip.localScale = new Vector3(1, 1, 1);
+                attack = false;
+            }
         }
-        else if (attack)
+
+
+        
+        //찌르는 무기
+        else
         {
-            leftFlip.localScale = new Vector3(1, 1, 1);
-            attack = false;
+            //창끝이 앞으로 보게하려고
+            leftHand.up = leftRotate.right;
+            
         }
 
 
         // 이펙트 마우스방향으로 회전
         Vector2 dir = (cursor.position - leftRotate.position).normalized;
         leftRotate.transform.right = dir;
+
         //무기의 사거리만큼이동한곳에 이펙트 생성
         //PooledObject pooledObject = Manager.Pool.GetPool(itemData.items[equipemntNumber].effect, leftRotate.position + (Vector3)(dir * (itemData.items[equipemntNumber].range/2)),leftRotate.rotation);
         GameObject abc = Instantiate(itemData.items[equipemntNumber].effect, leftRotate.position + (Vector3)(dir * (itemData.items[equipemntNumber].range / 2)), leftRotate.rotation);
@@ -512,19 +532,20 @@ public class PlayerMove : MonoBehaviour, IDamagable
         jumping = false;
     }
 
-
+    
     private void OnMouseScroll(InputValue value)
     {
         mouseScrollDir = value.Get<Vector2>();
         EquipmentChange();
     }
 
+    
+
     //휠로 장비교체
     private void EquipmentChange()
     {
         if(mouseScrollDir.y > 0 || mouseScrollDir.y < 0)
         {
-            Debug.Log("업스크롤");
             if (equipemntNumber == firstEquipment)
                 equipemntNumber = secondEquipment;
             else if(equipemntNumber != firstEquipment)
@@ -532,7 +553,6 @@ public class PlayerMove : MonoBehaviour, IDamagable
                 equipemntNumber = firstEquipment;
             }
         }
-        
     }
 
 
@@ -556,12 +576,14 @@ public class PlayerMove : MonoBehaviour, IDamagable
 
     public void TakeDamage(int damage)
     {
-        Manager.Game.hpBar.Damage(damage);
+        hp -= damage;
+        Manager.Game.hpBar.Damage(hp);
     }
 
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(leftRotate.position, itemData.items[equipemntNumber].range);
+        Gizmos.DrawLine(leftRotate.position, cursor.position);
     }
 }

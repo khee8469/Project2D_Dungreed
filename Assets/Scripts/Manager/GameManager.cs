@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class GameManager : Singleton<GameManager>
 {
-    public void Test()
-    {
-        Debug.Log(GetInstanceID());
-    }
+    public PlayerMove player;
+    public HpBar hpBar;
 }

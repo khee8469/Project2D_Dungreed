@@ -3,20 +3,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "ItemData", menuName = "Data/Item")]  //
-public class ItemData : ScriptableObject
+[CreateAssetMenu(fileName = "WeaponData", menuName = "Data/Weapon")]  //
+public class WeaponData : ScriptableObject
 {
     //public Item prefab;
-    public ItemInfo[] items;
+    public WeaponInfo[] weapons;
 
 
     [Serializable]
-    public struct ItemInfo
+    public struct WeaponInfo
     {
-        public Item Weapon;
+        public Weapon weapon;
+        public int weaponPos;
         public GameObject effect;
         public float effectPlayTime;
-        
+
         public string name;
         public int damage;
         public float range;

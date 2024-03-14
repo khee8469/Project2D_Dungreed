@@ -1,18 +1,24 @@
-using System.Collections;
-using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
-public class Spear : Item
+public class Spear : Weapon
 {
-    // Start is called before the first frame update
-    void Start()
+    [SerializeField] Transform leftFlip;
+
+
+
+    public override Vector3 WeaponPosition()
+    {
+        return new Vector3(0, 0, -90);
+    }
+
+    public override void AttackMotion()
     {
         
     }
 
-    // Update is called once per frame
-    void Update()
+    public override void Skill()
     {
-        
+
     }
 }

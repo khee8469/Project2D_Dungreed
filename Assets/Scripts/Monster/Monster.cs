@@ -15,6 +15,7 @@ public class Monster : MonoBehaviour, IDamagable
     [SerializeField] bool isGround;
     [SerializeField] bool isJump;
     private float cosRange;
+    [SerializeField] int hp;
     
     [SerializeField] Transform player;
     [SerializeField] Rigidbody2D rigid;
@@ -29,6 +30,7 @@ public class Monster : MonoBehaviour, IDamagable
 
     private void Awake()
     {
+        hp = monsterData.monsters[monsterNumber].hp;
         cosRange = Mathf.Cos(monsterData.monsters[monsterNumber].attackAngle * Mathf.Deg2Rad);   //탐색 범위  cosRange == 0.5
     }
 
@@ -93,7 +95,7 @@ public class Monster : MonoBehaviour, IDamagable
             ChangeState(State.Trace);
         }
         //사망
-        if (monsterData.monsters[monsterNumber].hp <= 0)
+        if (hp <= 0)
         {
             ChangeState(State.Die);
         }
@@ -173,7 +175,7 @@ public class Monster : MonoBehaviour, IDamagable
             StartCoroutine(Attacking());
         }
 
-        if (monsterData.monsters[monsterNumber].hp <= 0)
+        if (hp <= 0)
         {
             ChangeState(State.Die);
         }
@@ -202,7 +204,7 @@ public class Monster : MonoBehaviour, IDamagable
             StartCoroutine(Attacking());
         }
 
-        if (monsterData.monsters[monsterNumber].hp <= 0)
+        if (hp <= 0)
         {
             ChangeState(State.Die);
         }
@@ -224,7 +226,7 @@ public class Monster : MonoBehaviour, IDamagable
             ChangeState(State.Trace);
         }
 
-        if (monsterData.monsters[monsterNumber].hp <= 0)
+        if (hp <= 0)
         {
             ChangeState(State.Die);
         }
@@ -243,7 +245,7 @@ public class Monster : MonoBehaviour, IDamagable
     public void TakeDamage(int damage)
     {
         //Debug.Log("데미지");
-        monsterData.monsters[monsterNumber].hp -= damage;
+        hp -= damage;
     }
 
     //애니메이션 이벤트에 실행

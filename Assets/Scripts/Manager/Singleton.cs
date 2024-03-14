@@ -21,7 +21,8 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
     public static void CreateInstance()
     {
         T resource = Resources.Load<T>($"Manager/{typeof(T).Name}");
-        instance = Instantiate(resource);
+        if(resource != null)
+            instance = Instantiate(resource);
     }
 
     public static void ReleaseInstance()

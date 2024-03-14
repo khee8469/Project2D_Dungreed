@@ -13,6 +13,7 @@ public class UIManager : Singleton<UIManager>
     [SerializeField] Button inGameBlocker;
 
     private Stack<PopUpUI> popUpStack = new Stack<PopUpUI>();
+    public Stack<PopUpUI> PopUpStack { get { return popUpStack; } }
     private float prevTimeScale;
     private InGameUI curInGameUI;
 

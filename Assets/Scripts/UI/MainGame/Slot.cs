@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -11,21 +12,21 @@ public class Slot : MonoBehaviour
 {
     public int slotNumber;
     public Item item;
-    public Image itemIcon;
+    public Image slotIcon;
+
 
     //아이템을 먹은 후 Slot에 정보 Update
     public void UpdateSlotUI()
     {
-        itemIcon.sprite = item.itemImage;  // 슬롯 이미지를 먹은 아이템 이미지로 변경
-        itemIcon.gameObject.SetActive(true);  // 슬롯 이미지 활성화
+        slotIcon.sprite = item.itemImage;  // 슬롯 이미지를 먹은 아이템 이미지로 변경
+        slotIcon.gameObject.SetActive(true);  // 슬롯 이미지 활성화
     }
 
     public void RemoveSlot()
     {
-        if(item != null)
+        if(item == null)
         {
-            item = null;  // Slot에 Item 정보가 담겨있지 않다면
+            slotIcon.gameObject.SetActive(false);
         }
-        itemIcon.gameObject.SetActive(false);  //  슬롯 이미지 비활성화
     }
 }

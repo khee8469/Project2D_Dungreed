@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public enum ItemType { Equipment, Consumables, Etc }
+public enum ItemType { Equipment, accessory, Etc }
 
 [Serializable]
 public class Item

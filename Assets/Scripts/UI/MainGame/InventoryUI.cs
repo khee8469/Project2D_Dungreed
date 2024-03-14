@@ -1,14 +1,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using static InventoryUI;
 using static UnityEditor.Progress;
 
-public class InventoryUI : WindowUI
+public class InventoryUI : PopUpUI, IPointerClickHandler
 {
     [SerializeField] LayerMask itemLayer;
-
     public Transform slotParent;
     [SerializeField] Slot[] slots;  //start에서 찾아둔 Slot들
     
@@ -44,6 +44,8 @@ public class InventoryUI : WindowUI
         
     }
 
+    
+
     private void SlotChange(int value)
     {
         for (int i = 0; i < slots.Length; i++)
@@ -72,11 +74,11 @@ public class InventoryUI : WindowUI
             slots[i].item = items[i];
             slots[i].UpdateSlotUI();
         }
-        /*for (int i = 0; i < slots.Length;i++)
+        for (int i = 0; i < slots.Length; i++)
         {
             //비어진 슬롯 이미지 비활성화
             slots[i].RemoveSlot();
-        }*/
+        }
     }
 
     //슬롯추가
@@ -112,5 +114,17 @@ public class InventoryUI : WindowUI
     {
         items.RemoveAt(index);
         RedrawSlotUI();
+    }
+
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if(eventData.button == PointerEventData.InputButton.Right)
+        {
+            if(Item != null)
+            {
+
+            }
+        }
     }
 }

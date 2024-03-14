@@ -6,7 +6,6 @@ public class GameManager : Singleton<GameManager>
     public PlayerMove player;
     public HpBar hpBar;
 
-
     public ItemDatabase itemDatabase;
     public InventoryUI inventoryUI;
 
@@ -18,6 +17,5 @@ public class GameManager : Singleton<GameManager>
 
         itemDatabase = FindObjectOfType<ItemDatabase>();
         inventoryUI = FindObjectOfType<InventoryUI>();
-        
     }
 }

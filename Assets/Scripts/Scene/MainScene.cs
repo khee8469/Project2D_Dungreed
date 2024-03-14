@@ -6,11 +6,14 @@ using UnityEngine.InputSystem;
 public class MainScene : BaseScene
 {
     [SerializeField] PauseUI pauseUIPrefab;
-    [SerializeField] InventoryUI InventoryUIPrefab;
-    [SerializeField] StateUI stateUIPrefab;
-    [SerializeField] WindowUI inventory;
-    [SerializeField] WindowUI state;
-    //public bool isPause { get; private set; }
+    //[SerializeField] InventoryUI InventoryUIPrefab;
+
+    [SerializeField] InventoryUI inventory;
+    [SerializeField] StateUI state;
+
+    bool invenOpen;
+    bool stateOpen;
+
     private void OnPause(InputValue value)
     {
         if(Manager.UI.PopUpStack.Count == 0)
@@ -31,27 +34,31 @@ public class MainScene : BaseScene
         isPause = !isPause;
     }*/
 
-    private void OnInventoryOpen(InputValue value) 
+    private void OnInventoryOpen(InputValue value)
     {
-        if (!FindAnyObjectByType<InventoryUI>())
+        invenOpen = !invenOpen;
+        if (invenOpen)
         {
-            inventory = Manager.UI.ShowWindowUI(InventoryUIPrefab);
+            inventory.transform.position = new Vector3(960, 540, 0);
         }
+
         else
         {
-            Manager.UI.CloseWindowUI(inventory);
+            inventory.transform.position = new Vector3(1760, 540, 0);
         }
     }
 
     private void OnStateOpen(InputValue value)
     {
-        if (!FindAnyObjectByType<StateUI>())
+        stateOpen = !stateOpen;
+        if (stateOpen)
         {
-            state = Manager.UI.ShowWindowUI(stateUIPrefab);
+            state.transform.position = new Vector3(960, 540, 0);
         }
+
         else
         {
-            Manager.UI.CloseWindowUI(state);
+            state.transform.position = new Vector3(0, 540, 0);
         }
     }
 

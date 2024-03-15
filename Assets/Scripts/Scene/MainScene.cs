@@ -39,12 +39,14 @@ public class MainScene : BaseScene
         invenOpen = !invenOpen;
         if (invenOpen)
         {
-            inventory.transform.position = new Vector3(960, 540, 0);
+            //inventory.transform.position = new Vector3(960, 540, 0);
+            inventory.gameObject.SetActive(true);
         }
 
         else
         {
-            inventory.transform.position = new Vector3(1760, 540, 0);
+            //inventory.transform.position = new Vector3(1760, 540, 0);
+            inventory.gameObject.SetActive(false);
         }
     }
 

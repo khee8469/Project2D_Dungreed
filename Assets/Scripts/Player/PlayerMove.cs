@@ -101,6 +101,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
     void Update()
     {
         Mouse();
+       
         if (coolTime > 0)
         {
             coolTime -= Time.deltaTime;
@@ -595,15 +596,13 @@ public class PlayerMove : MonoBehaviour, IDamagable
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        //if (collision.CompareTag("FieldItem"))
         if ((1 << collision.gameObject.layer & itemLayer) != 0)
         {
-            FieldItems fieldItems = collision.GetComponent<FieldItems>();
             
-            if (Manager.Game.inventoryUI.AddItem(fieldItems?.GetItem()))
+            FieldItems fieldItems = collision.GetComponent<FieldItems>();
+            if (Manager.Game.inventoryUI.AddItem(fieldItems?.item))
             {
                 Destroy(fieldItems.gameObject);
-                //Destroy(fieldItems); //이건 컴포넌트만 삭제하는거임
             }
         }
     }

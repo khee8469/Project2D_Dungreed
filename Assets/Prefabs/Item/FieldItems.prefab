@@ -120,7 +120,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 0.21875
+  m_Radius: 0.46
 --- !u!114 &824542967534889848
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -137,4 +137,4 @@ MonoBehaviour:
     itemType: 0
     itemName: 
     itemImage: {fileID: 0}
-  image: {fileID: 7164356432023239249}
+  itemImage: {fileID: 7164356432023239249}

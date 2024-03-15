@@ -9,6 +9,7 @@ public class GameManager : Singleton<GameManager>
     public ItemDatabase itemDatabase;
     public InventoryUI inventoryUI;
 
+
     private void Start()
     {
         player = FindObjectOfType<PlayerMove>();
@@ -17,5 +18,6 @@ public class GameManager : Singleton<GameManager>
 
         itemDatabase = FindObjectOfType<ItemDatabase>();
         inventoryUI = FindObjectOfType<InventoryUI>();
+
     }
 }

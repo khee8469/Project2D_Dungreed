@@ -1,32 +1,107 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 
 //슬롯은 이미지만 바꾸는거엿구나
-public class Slot : MonoBehaviour
+public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler
 {
-    public int slotNumber;
-    public Item item;
-    public Image slotIcon;
+    public ItemInfo itemInfo;
+    public Image itemImage;
 
 
-    //아이템을 먹은 후 Slot에 정보 Update
-    public void UpdateSlotUI()
+    Transform parent;
+
+
+    //슬롯에 아이템 이미지 추가
+    public void AddImageSlot()//UpdateSlotUI()
     {
-        slotIcon.sprite = item.itemImage;  // 슬롯 이미지를 먹은 아이템 이미지로 변경
-        slotIcon.gameObject.SetActive(true);  // 슬롯 이미지 활성화
+        //itemImage.gameObject.SetActive(true);  // 슬롯 이미지 활성화
+        SetColor(1);
+        itemImage.sprite = itemInfo.itemImage;  // 슬롯 이미지를 먹은 아이템 이미지로 변경
     }
 
-    public void RemoveSlot()
+
+
+
+    //슬롯초기화
+    public void ClearSlot()
     {
-        if(item == null)
+        itemInfo = null; // 참조 null
+        SetColor(0);
+        //itemImage.gameObject.SetActive(false);
+    }
+
+
+    //투명도 조절
+    private void SetColor(float alpha)
+    {
+        Color color = itemImage.color;
+        color.a = alpha;
+        itemImage.color = color;
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (eventData.button == PointerEventData.InputButton.Right)
         {
-            slotIcon.gameObject.SetActive(false);
+            if (itemInfo.itemImage != null)
+            {
+                if (itemInfo.itemType == ItemType.Equipment)
+                {
+                    //장착
+                }
+            }
+        }
+    }
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        if (itemInfo.itemImage != null)
+        {
+            SetColor(0); // 원래있던거 투명하게
+            DragSlot.instance.dragSlot = this;
+            DragSlot.instance.DragSetImage(itemImage);
+            DragSlot.instance.transform.position = eventData.position;
+
+        }
+    }
+
+    public void OnDrag(PointerEventData eventData)
+    {
+        if (itemInfo.itemImage != null)
+        {
+            DragSlot.instance.transform.position = eventData.position;
+        }
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        Debug.Log("드래그");
+        DragSlot.instance.dragSlot.SetColor(0);
+    }
+
+    public void OnDrop(PointerEventData eventData)
+    {
+        if (DragSlot.instance.dragSlot != null)
+        {
+            ChangeSlot();
+        }
+
+    }
+
+    private void ChangeSlot()
+    {
+        ItemInfo temp = itemInfo;
+        Manager.Game.inventoryUI.AddItem(DragSlot.instance.dragSlot.itemInfo); //
+
+        if (temp.itemImage != null)
+        {
+            DragSlot.instance.dragSlot.itemInfo = temp;
+        }
+        else
+        {
+            DragSlot.instance.dragSlot.ClearSlot();
         }
     }
 }

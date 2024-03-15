@@ -79,7 +79,6 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
     {
         Debug.Log("µå·¡±×");
         DragSlot.instance.OutImage(DragSlot.instance.dragSlot.itemImage);
-        Debug.Log(DragSlot.instance.dragSlot);
     }
 
     public void OnDrop(PointerEventData eventData)
@@ -88,12 +87,12 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
         {
             ChangeSlot();
         }
-
     }
 
     private void ChangeSlot()
     {
         ItemInfo temp = itemInfo;
+        //itemInfo = DragSlot.instance.dragSlot.itemInfo;
         Manager.Game.inventoryUI.AddItem(DragSlot.instance.dragSlot.itemInfo); //
 
         if (temp.itemImage != null)

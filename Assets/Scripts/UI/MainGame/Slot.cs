@@ -78,7 +78,8 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
     public void OnEndDrag(PointerEventData eventData)
     {
         Debug.Log("µå·¡±×");
-        DragSlot.instance.dragSlot.SetColor(0);
+        DragSlot.instance.OutImage(DragSlot.instance.dragSlot.itemImage);
+        Debug.Log(DragSlot.instance.dragSlot);
     }
 
     public void OnDrop(PointerEventData eventData)

@@ -598,7 +598,6 @@ public class PlayerMove : MonoBehaviour, IDamagable
     {
         if ((1 << collision.gameObject.layer & itemLayer) != 0)
         {
-            
             FieldItems fieldItems = collision.GetComponent<FieldItems>();
             if (Manager.Game.inventoryUI.AddItem(fieldItems?.item))
             {

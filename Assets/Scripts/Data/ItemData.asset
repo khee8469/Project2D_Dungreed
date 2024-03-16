@@ -16,9 +16,18 @@ MonoBehaviour:
   - itemType: 2
     itemName: "\uCF54\uC778"
     itemImage: {fileID: 21300000, guid: b00839d22782b15489b3f1f99aa9cc39, type: 3}
-  - itemType: 0
+  - itemType: 2
     itemName: "\uAE08\uAD34"
     itemImage: {fileID: 21300000, guid: f669938d374cfc642bc8360693a99281, type: 3}
-  - itemType: 0
+  - itemType: 2
     itemName: "\uC740\uAD34"
     itemImage: {fileID: 21300000, guid: eb398762e30ea594a8261acb2f62e476, type: 3}
+  - itemType: 0
+    itemName: "\uC20F\uC18C\uB4DC"
+    itemImage: {fileID: 21300000, guid: f99970f6d125879428a941b9ac4442d1, type: 3}
+  - itemType: 0
+    itemName: "\uB871\uC18C\uB4DC"
+    itemImage: {fileID: 21300000, guid: a4e5f5d43f5e95446b5c6502769c9392, type: 3}
+  - itemType: 0
+    itemName: "\uCC3D"
+    itemImage: {fileID: 21300000, guid: a3a4af6d4b0b7124eadb31fd2fbfbb04, type: 3}

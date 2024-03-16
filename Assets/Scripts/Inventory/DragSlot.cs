@@ -11,31 +11,33 @@ public class DragSlot : MonoBehaviour
 
     public Slot dragSlot;
 
-    [SerializeField] Image imageItem;
+    public Image itemImage;
 
     private void Start()
     {
+        itemImage = GetComponent<Image>();
         instance = this;
     }
 
 
-    public void DragSetImage(Image itemImage)
+    public void DragSlotSetImage(Sprite itemImage)
     {
-        this.imageItem.sprite = itemImage.sprite;
+        this.itemImage.sprite = itemImage;
         SetColor(1);
     }
 
-    public void OutImage(Image itemImage)
+    public void DragSlotClear()
     {
-        this.imageItem.sprite = itemImage.sprite;
+        this.itemImage.sprite = null;
+        dragSlot = null;
         SetColor(0);
     }
 
     public void SetColor(float alpha)
     {
-        Color color = imageItem.color;
+        Color color = itemImage.color;
         color.a = alpha;
-        imageItem.color = color;
+        itemImage.color = color;
     }
 
    

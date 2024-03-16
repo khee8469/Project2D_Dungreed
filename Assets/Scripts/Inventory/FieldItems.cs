@@ -19,5 +19,4 @@ public class FieldItems : MonoBehaviour
 
         this.itemImage.sprite = item.itemImage;
     }
-
 }

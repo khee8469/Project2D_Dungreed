@@ -1,6 +1,4 @@
 using System.Collections;
-using Unity.VisualScripting;
-using Unity.VisualScripting.Antlr3.Runtime.Misc;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,7 +7,6 @@ public class PlayerMove : MonoBehaviour, IDamagable
 {
     public enum State { Idle, Run, Jump, Dash, EquipmentChange, Die }
 
-    [SerializeField] WeaponData WeaponData;
 
     [Header("PlayerMotion")]
     [SerializeField] Rigidbody2D rigid;
@@ -33,6 +30,8 @@ public class PlayerMove : MonoBehaviour, IDamagable
     [SerializeField] Transform effectPos;
     [SerializeField] PooledObject runEffectPrefab;
     [SerializeField] PooledObject jumpEffectPrefab;
+    [SerializeField] DamageText damageTextPrifab;
+    [SerializeField] Transform damageTextPos;
 
     [Header("LayerMask")]
     [SerializeField] LayerMask groundLayer; // 바닥확인용 레이어
@@ -57,15 +56,13 @@ public class PlayerMove : MonoBehaviour, IDamagable
 
     [Header("AttackRange")]
     [SerializeField] Transform cursor;
-    [SerializeField] int attackAngle;
-    float cosAngle;
+    //[SerializeField] int attackAngle;
+    //public float cosAngle;
 
     [Header("Equipment")]
-    [SerializeField] int firstEquipment;
-    [SerializeField] int secondEquipment;
-
-    [SerializeField] int equipemntNumber;
-    [SerializeField] Transform equipmentPos;
+    //[SerializeField] int EquipNumChange;
+    [SerializeField] int curEquipemnt;
+    [SerializeField] SpriteRenderer equipmentImage;
     [SerializeField] float coolTime;
 
     State state = State.Idle; // 초기상태
@@ -82,35 +79,28 @@ public class PlayerMove : MonoBehaviour, IDamagable
     public void Awake()
     {
         mousePos = new Vector3(0, 0, 10);
-        cosAngle = Mathf.Cos(WeaponData.weapons[equipemntNumber].angleRange * Mathf.Deg2Rad);
+
         Manager.Pool.CreatePool(jumpEffectPrefab, 2, 4);
         Manager.Pool.CreatePool(runEffectPrefab, 4, 8);
-        //Manager.Pool.CreatePool(itemData.weapons[equipemntNumber].effect, 2, 4);
-
-
     }
 
     private void Start()
     {
         Manager.Game.hpBar.SetHp(hp, maxHp); // hp 설정
-        //mainScene = FindObjectOfType<MainScene>();
 
-        EquipmentChangeState(); // 장비장착
+        StartEquipment(); //시작 장비
     }
+
+
 
     void Update()
     {
         Mouse();
-       
+
         if (coolTime > 0)
         {
             coolTime -= Time.deltaTime;
         }
-
-
-        //장비 스프라이트 교체
-        /*Item a = itemData.weapons[equipemntNumber].weapon;
-        equipment.sprite = a.transform.GetComponent<SpriteRenderer>().sprite;*/
 
         switch (state)
         {
@@ -133,6 +123,8 @@ public class PlayerMove : MonoBehaviour, IDamagable
                 DieState();
                 break;
         }
+        
+        EquipmentScrollChange();  // 스크롤로 무기 이미지 변경
     }
 
 
@@ -197,8 +189,6 @@ public class PlayerMove : MonoBehaviour, IDamagable
         }
     }
 
-
-
     private void RunState()
     {
         //Debug.Log("Run");
@@ -229,9 +219,9 @@ public class PlayerMove : MonoBehaviour, IDamagable
         if (hp <= 0)
         {
             ChangeState(State.Die);
+
         }
     }
-
 
     private void JumpState()
     {
@@ -291,43 +281,40 @@ public class PlayerMove : MonoBehaviour, IDamagable
         }
     }
 
+    //휠로 장비교체
     private void OnMouseScroll(InputValue value)
     {
         mouseScrollDir = value.Get<Vector2>();
-        EquipmentChange();
-    }
-
-
-
-    //휠로 장비교체
-    private void EquipmentChange()
-    {
-        if (mouseScrollDir.y > 0 || mouseScrollDir.y < 0)
+        if (mouseScrollDir.y > 0)
         {
-            if (equipemntNumber == firstEquipment)
-                equipemntNumber = secondEquipment;
-            else if (equipemntNumber != firstEquipment)
-            {
-                equipemntNumber = firstEquipment;
-            }
-            EquipmentChangeState();
+            curEquipemnt = 0;
+        }
+        else if (mouseScrollDir.y < 0)
+        {
+            curEquipemnt = 1;
         }
     }
 
-    private void EquipmentChangeState()
+    //스크롤로 장비이미지로 교체
+    private void EquipmentScrollChange()
     {
-        //Debug.Log("장비장착");
-        //들고있는장비가잇으면 파괴
-        if (equipmentPos.transform.childCount != 0)
+        if (curEquipemnt == 0)
         {
-            Destroy(equipmentPos.GetComponentInChildren<Weapon>().gameObject);
+            equipmentImage.sprite = Manager.Game.inventoryUI.equipmentSlots[0].itemInfo.itemImage;
         }
+        else if (curEquipemnt == 1)
+        {
+            equipmentImage.sprite = Manager.Game.inventoryUI.equipmentSlots[1].itemInfo.itemImage;
+        }
+    }
 
-        //생성후 자식으로 만들기
-        Weapon weapon = Instantiate(WeaponData.weapons[equipemntNumber].weapon, equipmentPos.position, equipmentPos.rotation);
-        weapon.transform.parent = equipmentPos.transform;
-        //위치조정
-        weapon.transform.rotation = leftHand.rotation * Quaternion.Euler(WeaponData.weapons[equipemntNumber].weapon.WeaponPosition());
+    //시작장비
+    private void StartEquipment()
+    {
+        Manager.Game.inventoryUI.equipmentSlots[0].itemInfo = Manager.Game.itemDatabase.itemData.itemInfo[0]; // 1번슬롯에 무기 데이터 입력
+        Manager.Game.inventoryUI.equipmentSlots[0].SlotSetImage();  // 1번슬롯에 무기 이미지 입력
+        Manager.Game.inventoryUI.equipmentSlots[0].slotState = SlotState.Fill;  // 1번슬롯 장착상태로 변경
+        equipmentImage.sprite = Manager.Game.inventoryUI.equipmentSlots[0].itemInfo.itemImage;  // 케릭터 손에 무기이미지 입력
     }
 
 
@@ -336,7 +323,6 @@ public class PlayerMove : MonoBehaviour, IDamagable
         Debug.Log("죽음");
         //setactive false로바꾸고 죽은 이미지만 생성해둘까
     }
-
 
 
 
@@ -411,10 +397,6 @@ public class PlayerMove : MonoBehaviour, IDamagable
             effectPos.transform.localScale = new Vector3(-1, 1, 1);
             frontRayPoint.rotation = Quaternion.Euler(0, 0, 0);
         }
-        else
-        {
-
-        }
     }
 
 
@@ -468,27 +450,58 @@ public class PlayerMove : MonoBehaviour, IDamagable
     {
         cursor.position = Camera.main.ScreenToWorldPoint(mouseMove) + mousePos;
 
-        if (transform.position.x < cursor.position.x) //equipemntNumber <4 임시 창뒤짚힘 방지
+        //if (curEquipemnt == 0) //0번무기일때
+        //{
+        if (transform.position.x < cursor.position.x)
         {
             //x축 반넘어갔을때 반전시키는 모션
-            leftRotate.transform.localScale = new Vector3(1, 1, 1);
+            if (Manager.Game.inventoryUI.equipmentSlots[0].itemInfo.weaponNumber < 2)
+            {
+                leftRotate.transform.localScale = new Vector3(1, 1, 1);
+            }
+            //플레이어 이미지반전
+            spriteRenderer.flipX = false;
+        }
+        else if (transform.position.x > cursor.position.x)
+        {
+            if (Manager.Game.inventoryUI.equipmentSlots[0].itemInfo.weaponNumber < 2)
+            {
+                leftRotate.transform.localScale = new Vector3(1, -1, 1);
+            }
+            //leftFlip.rotation = Quaternion.Euler(0, 0, 0);
+            spriteRenderer.flipX = true;
+        }
+        /*}
+        else if (curEquipemnt == 1) //1번무기일때
+        {
+        if (transform.position.x < cursor.position.x)
+        {
+            //x축 반넘어갔을때 반전시키는 모션
+            if (Manager.Game.inventoryUI.equipmentSlots[1].itemInfo.weaponNumber < 2)
+            {
+                leftRotate.transform.localScale = new Vector3(1, 1, 1);
+            }
             //leftFlip.rotation = Quaternion.Euler(180, 0, 0);
             //플레이어 이미지반전
             spriteRenderer.flipX = false;
         }
         else if (transform.position.x > cursor.position.x)
         {
-            leftRotate.transform.localScale = new Vector3(1, -1, 1);
+            if (Manager.Game.inventoryUI.equipmentSlots[1].itemInfo.weaponNumber < 2)
+            {
+                leftRotate.transform.localScale = new Vector3(1, -1, 1);
+            }
             //leftFlip.rotation = Quaternion.Euler(0, 0, 0);
             spriteRenderer.flipX = true;
         }
+        }*/
+
 
         //right방향이 마우스방향을 바라보게하기
         Vector2 dir = (cursor.position - leftRotate.position).normalized;
         leftRotate.right = dir;
     }
 
-    //WeaponData.weapons[equipemntNumber].weapon.WeaponAttack();
     //공격
     private void OnLeftMouse(InputValue value)
     {
@@ -497,22 +510,37 @@ public class PlayerMove : MonoBehaviour, IDamagable
         {
             Attack();
             AttactEffect();
-            coolTime = WeaponData.weapons[equipemntNumber].coolTime;
+            coolTime = Manager.Game.inventoryUI.equipmentSlots[curEquipemnt].itemInfo.coolTime;
         }
     }
 
+
+    //공격타겟지정 및 공격
+    Collider2D[] colliders = new Collider2D[10];
     private void Attack()
     {
         //Debug.Log("공격");
-        int size = Physics2D.OverlapCircleNonAlloc(leftRotate.position, WeaponData.weapons[equipemntNumber].range, colliders, targetLayer);
+        int size = Physics2D.OverlapCircleNonAlloc(leftRotate.position, Manager.Game.inventoryUI.equipmentSlots[curEquipemnt].itemInfo.range, colliders, targetLayer);
         for (int i = 0; i < size; i++)
         {
-            Vector2 dir = (colliders[i].transform.position - leftRotate.position).normalized;
-
+            //몬스터방향
+            Vector2 monDir = (colliders[i].transform.position - leftRotate.position).normalized;
+            //마우스방향
+            Vector2 curDir = (cursor.position - leftRotate.position).normalized;
             IDamagable monster = colliders[i].GetComponent<IDamagable>();
-            if (Vector2.Dot(dir, cursor.position) > cosAngle)
+
+            Debug.Log(Manager.Game.inventoryUI.equipmentSlots[curEquipemnt].itemInfo.itemName);
+            if (Vector3.Dot(monDir, curDir) > Manager.Game.inventoryUI.equipmentSlots[curEquipemnt].itemInfo.cosAngle)
             {
-                monster.TakeDamage(WeaponData.weapons[equipemntNumber].damage);
+                if (curEquipemnt == 0)
+                {
+                    monster.TakeDamage(Manager.Game.inventoryUI.equipmentSlots[0].itemInfo.damage);
+                }
+                    
+                else if (curEquipemnt == 1)
+                {
+                    monster.TakeDamage(Manager.Game.inventoryUI.equipmentSlots[1].itemInfo.damage);
+                } 
             }
         }
     }
@@ -520,45 +548,74 @@ public class PlayerMove : MonoBehaviour, IDamagable
     private void AttactEffect()
     {
         //Debug.Log("공격효과");
-        //좌우로 휘두르는 무기
-        if (equipemntNumber < 4) // 임시 테스트
+
+        //좌우로 휘두르는 무기, 찌르는 무기
+        if (curEquipemnt == 0)
         {
-            if (!weaponWield)
+            if (Manager.Game.inventoryUI.equipmentSlots[0].itemInfo.weaponNumber < 2) // 임시 테스트
             {
-                leftFlip.localScale = new Vector3(1, -1, 1);
-                weaponWield = true;
+                if (!weaponWield)
+                {
+                    leftFlip.localScale = new Vector3(1, -1, 1);
+                    weaponWield = true;
+                }
+                else if (weaponWield)
+                {
+                    leftFlip.localScale = new Vector3(1, 1, 1);
+                    weaponWield = false;
+                }
             }
-            else if (weaponWield)
+
+            else if (Manager.Game.inventoryUI.equipmentSlots[0].itemInfo.weaponNumber >= 2)
             {
-                leftFlip.localScale = new Vector3(1, 1, 1);
-                weaponWield = false;
+                StartCoroutine(SpearAttack());
+            }
+        }
+        else if (curEquipemnt == 1)
+        {
+            if (Manager.Game.inventoryUI.equipmentSlots[1].itemInfo.weaponNumber < 2) // 임시 테스트
+            {
+                if (!weaponWield)
+                {
+                    leftFlip.localScale = new Vector3(1, -1, 1);
+                    weaponWield = true;
+                }
+                else if (weaponWield)
+                {
+                    leftFlip.localScale = new Vector3(1, 1, 1);
+                    weaponWield = false;
+                }
+            }
+
+            else if (Manager.Game.inventoryUI.equipmentSlots[1].itemInfo.weaponNumber >= 2)
+            {
+                StartCoroutine(SpearAttack());
             }
         }
 
-        else if(equipemntNumber >= 4)
-        {
-            StartCoroutine(SpearAttack());
-        }
 
 
-
-
-
-        // 이펙트 마우스방향으로 회전
+        // 이펙트
+        // 마우스방향으로 회전
         Vector2 dir = (cursor.position - leftRotate.position).normalized;
         leftRotate.transform.right = dir;
 
-        // 무기의 사거리만큼이동한곳에 이펙트 생성
-        //PooledObject pooledObject = Manager.Pool.GetPool(WeaponData.items[equipemntNumber].effect, leftRotate.position + (Vector3)(dir * (WeaponData.items[equipemntNumber].range/2)),leftRotate.rotation);
-        GameObject abc = Instantiate(WeaponData.weapons[equipemntNumber].effect, leftRotate.position + (Vector3)(dir * (WeaponData.weapons[equipemntNumber].range / 2)), leftRotate.rotation);
-        Destroy(abc, WeaponData.weapons[equipemntNumber].effectPlayTime);
+        if (curEquipemnt == 0)
+        {
+            GameObject abc = Instantiate(Manager.Game.inventoryUI.equipmentSlots[curEquipemnt].itemInfo.effect, leftRotate.position + (Vector3)(dir * (Manager.Game.inventoryUI.equipmentSlots[curEquipemnt].itemInfo.range / 2)), leftRotate.rotation);
+            Destroy(abc, Manager.Game.inventoryUI.equipmentSlots[curEquipemnt].itemInfo.effectPlayTime);
+        }
+        if (curEquipemnt == 1)
+        {
+            GameObject abc = Instantiate(Manager.Game.inventoryUI.equipmentSlots[curEquipemnt].itemInfo.effect, leftRotate.position + (Vector3)(dir * (Manager.Game.inventoryUI.equipmentSlots[curEquipemnt].itemInfo.range / 2)), leftRotate.rotation);
+            Destroy(abc, Manager.Game.inventoryUI.equipmentSlots[curEquipemnt].itemInfo.effectPlayTime);
+        }
+
+
         //effectAngle = Mathf.Atan2(cursor.position.y - leftRotate.position.y, cursor.position.x - leftRotate.position.x) * Mathf.Rad2Deg;
         //pooledObject.transform.rotation = Quaternion.AngleAxis(effectAngle, Vector3.forward);//forward(z축 기준)으로 회전
 
     }
-    //공격타겟지정 및 공격
-    Collider2D[] colliders = new Collider2D[10];
-
 
 
     //대쉬
@@ -589,9 +646,9 @@ public class PlayerMove : MonoBehaviour, IDamagable
 
     IEnumerator SpearAttack()
     {
-        leftHand.Translate(Vector2.right * 3);
+        leftHand.Translate(Vector2.right * 2.5f);
         yield return new WaitForSeconds(0.1f);
-        leftHand.Translate(Vector2.left * 3);
+        leftHand.Translate(Vector2.left * 2.5f);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -626,6 +683,8 @@ public class PlayerMove : MonoBehaviour, IDamagable
 
     public void TakeDamage(int damage)
     {
+        DamageText damageText = Instantiate(damageTextPrifab, damageTextPos.position, damageTextPos.rotation);
+        damageText.damage = damage;
         hp -= damage;
         Manager.Game.hpBar.Damage(hp);
     }
@@ -633,7 +692,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(leftRotate.position, WeaponData.weapons[equipemntNumber].range);
+        Gizmos.DrawWireSphere(leftRotate.position, Manager.Game.inventoryUI.equipmentSlots[curEquipemnt].itemInfo.range);
         Gizmos.DrawLine(leftRotate.position, cursor.position);
     }
 }

@@ -8,7 +8,7 @@ public class MainScene : BaseScene
     [SerializeField] PauseUI pauseUIPrefab;
     //[SerializeField] InventoryUI InventoryUIPrefab;
 
-    [SerializeField] InventoryUI inventory;
+    [SerializeField] GameObject inventory;
     [SerializeField] StateUI state;
 
     bool invenOpen;
@@ -55,12 +55,12 @@ public class MainScene : BaseScene
         stateOpen = !stateOpen;
         if (stateOpen)
         {
-            state.transform.position = new Vector3(960, 540, 0);
+            state.gameObject.SetActive(true);
         }
 
         else
         {
-            state.transform.position = new Vector3(0, 540, 0);
+            state.gameObject.SetActive(false);
         }
     }
 

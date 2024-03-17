@@ -11,7 +11,7 @@ public class InventoryUI : PopUpUI
     [SerializeField] Transform equipmentSlotParent;
     [SerializeField] Transform accessorySlotParent;
 
-    public Slot[] slots;  //start에서 찾아둔 Slot들
+    public Slot[] slots;  //인벤토리
     public Slot[] equipmentSlots;
     public Slot[] accessorySlots;
 
@@ -27,6 +27,11 @@ public class InventoryUI : PopUpUI
         slots = slotParent.GetComponentsInChildren<Slot>();
         equipmentSlots = equipmentSlotParent.GetComponentsInChildren<Slot>();
         accessorySlots= accessorySlotParent.GetComponentsInChildren<Slot>();
+    }
+
+    private void Start()
+    {
+        
     }
 
     //player가 아이템먹으면 실행

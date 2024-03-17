@@ -15,7 +15,7 @@ MonoBehaviour:
   monsters:
   - name: BigWhiteSkel
     damage: 3
-    hp: 10
+    hp: 50
     speed: 2
     jumpPower: 25
     findRange: 7

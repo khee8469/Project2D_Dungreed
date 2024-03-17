@@ -18,6 +18,5 @@ public class GameManager : Singleton<GameManager>
 
         itemDatabase = FindObjectOfType<ItemDatabase>();
         inventoryUI = FindObjectOfType<InventoryUI>();
-
     }
 }

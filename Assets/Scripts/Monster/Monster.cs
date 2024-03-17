@@ -9,7 +9,8 @@ public class Monster : MonoBehaviour, IDamagable
 
     [SerializeField] MonsterData monsterData;
     [SerializeField] int monsterNumber;
-
+    [SerializeField] DamageText damageTextPrifab;
+    [SerializeField] Transform damageTextPos;
     [SerializeField] float attackCoolTime;
     [SerializeField] bool isAttacking;
     [SerializeField] bool isGround;
@@ -244,6 +245,8 @@ public class Monster : MonoBehaviour, IDamagable
 
     public void TakeDamage(int damage)
     {
+        DamageText damageText = Instantiate(damageTextPrifab, damageTextPos.position, damageTextPos.rotation);
+        damageText.damage = damage;
         //Debug.Log("µ¥¹ÌÁö");
         hp -= damage;
     }

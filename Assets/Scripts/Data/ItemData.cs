@@ -23,7 +23,6 @@ public class ItemInfo
     public float effectPlayTime;
     public int damage;
     public float range;
-    public float cosAngle;
     public float angleRange;
     public float coolTime;
 }

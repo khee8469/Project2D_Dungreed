@@ -28,5 +28,6 @@ public class MonsterData : ScriptableObject
         public float attackAngle; 
         public float coolTime;
         public float attackTime; //공격중 시간
+        public int maxAngle;
     }
 }

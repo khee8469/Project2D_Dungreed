@@ -17,7 +17,7 @@ public class ItemDatabase : MonoBehaviour
             GameObject gameObject = Instantiate(fieldItemPrefab, fieldItemPos[i], Quaternion.identity);
             // 생성된 프리팹에 데이터베이스 데이터 입력
             int id = Random.Range(0, Manager.Resource.itemDic.Count);
-            Debug.Log(id);
+
             gameObject.GetComponent<FieldItems>().SetItem(Manager.Resource.itemDic[id].itemInfo.itemImage, Manager.Resource.itemDic[id].itemInfo.itemType, id);
         }
     }

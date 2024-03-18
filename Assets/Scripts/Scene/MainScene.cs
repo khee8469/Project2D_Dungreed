@@ -17,8 +17,8 @@ public class MainScene : BaseScene
 
     private void Start()
     {
-       // player = FindObjectOfType<PlayerMove>();
-        //hpBar = FindObjectOfType<HpBar>();
+        pauseUIPrefab = FindObjectOfType<PauseUI>();
+        hpBar = FindObjectOfType<HpBar>();
         //inventoryUI = FindObjectOfType<InventoryUI>();
         hpBar.SetHp(Manager.Data.GameData.hp, Manager.Data.GameData.maxHp);
     }

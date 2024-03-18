@@ -1,5 +1,4 @@
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 
 
@@ -18,12 +17,20 @@ public class Monster : MonoBehaviour, IDamagable
     [SerializeField] bool isJump;
     private float cosRange;
     [SerializeField] int hp;
-    
+
     [SerializeField] Transform player;
     [SerializeField] Rigidbody2D rigid;
     [SerializeField] SpriteRenderer spriteRenderer;
     [SerializeField] Animator animator;
     [SerializeField] FindGround groundCheck;
+
+    [Header("Slope")]
+    [SerializeField] LayerMask groundLayer;
+    [SerializeField] Transform frontRayPoint;
+    [SerializeField] Transform frontCheak;
+    [SerializeField] Vector2 perp;
+    [SerializeField] float slopeCheak;
+    [SerializeField] bool isSlope;
 
 
 
@@ -38,7 +45,11 @@ public class Monster : MonoBehaviour, IDamagable
 
     private void Update()
     {
-        attackCoolTime -= Time.deltaTime;
+        if (attackCoolTime > -0.5f)
+        {
+            attackCoolTime -= Time.deltaTime;
+        }
+
 
         switch (state)
         {
@@ -72,7 +83,7 @@ public class Monster : MonoBehaviour, IDamagable
                 animator.Play("Trace");
                 break;
             case State.Jump:
-                
+
                 break;
             case State.Attack:
                 animator.Play("Attack");
@@ -88,14 +99,17 @@ public class Monster : MonoBehaviour, IDamagable
 
     private void IdleState()
     {
-        //Debug.Log("idle");
-
+        Debug.Log("idle");
+        rigid.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
+            
 
         //발견거리보다 가까우면
         if ((player.position - transform.position).sqrMagnitude < Manager.Resource.monsterDic[monsterNumber].monsterInfo.findRange * Manager.Resource.monsterDic[monsterNumber].monsterInfo.findRange)
         {
             ChangeState(State.Trace);
+            rigid.constraints = RigidbodyConstraints2D.FreezeRotation;
         }
+        
         //사망
         if (hp <= 0)
         {
@@ -108,46 +122,77 @@ public class Monster : MonoBehaviour, IDamagable
 
     private void TraceState()
     {
-        //Debug.Log("trace");
-        
+        Debug.Log("trace");
+        //언덕체크
+        RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 0.5f, groundLayer);
+        RaycastHit2D frontHit = Physics2D.Raycast(frontCheak.position, frontCheak.right, 0.3f, groundLayer);
+        if (hit || frontHit)
+        {
+            if (frontHit) // 앞 언덕먼저 체크
+                SlopeChk(frontHit);
+            else if (hit)
+                SlopeChk(hit);
+        }
+        /*Debug.DrawLine(hit.point, hit.point + perp, Color.red);
+        Debug.DrawLine(hit.point, hit.point + hit.normal, Color.blue);
+        Debug.DrawLine(frontCheak.position, frontCheak.position + frontCheak.right, Color.blue);*/
 
         Vector2 dir = (player.position - transform.position).normalized;
 
-        if (dir.x > 0 && (player.position - transform.position).sqrMagnitude > Manager.Resource.monsterDic[monsterNumber].monsterInfo.attackRange * Manager.Resource.monsterDic[monsterNumber].monsterInfo.attackRange)
+        if(dir.x >0)  // frontCheak 좌우 방향용
+            frontRayPoint.rotation = Quaternion.Euler(0, 0, 0);
+        else
+            frontRayPoint.rotation = Quaternion.Euler(0, 180, 0);
+
+        Debug.Log(perp);
+
+        //언덕일때
+        if (dir.x >0 && isGround && isSlope && slopeCheak < Manager.Resource.monsterDic[monsterNumber].monsterInfo.maxAngle)
         {
-            if (dir.x > 0 && rigid.velocity.x < Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed)
-            {
-                rigid.velocity = new Vector2(Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed, rigid.velocity.y);
-                //rigid.AddForce(Vector3.right);
-            }
+            rigid.velocity = perp * -1 * Manager.Data.GameData.speed/4;
+            spriteRenderer.flipX = false;
+        }
+        else if (dir.x < 0 && isGround && isSlope && slopeCheak < Manager.Resource.monsterDic[monsterNumber].monsterInfo.maxAngle)
+        {
+            rigid.velocity = perp  * Manager.Data.GameData.speed /4;
+            spriteRenderer.flipX = true;
+        }
+
+        else if (dir.x > 0 && (player.position - transform.position).sqrMagnitude > Manager.Resource.monsterDic[monsterNumber].monsterInfo.attackRange * Manager.Resource.monsterDic[monsterNumber].monsterInfo.attackRange)
+        {
+            rigid.velocity = new Vector2(Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed, rigid.velocity.y);
             spriteRenderer.flipX = false;
         }
         else if (dir.x < 0 && (player.position - transform.position).sqrMagnitude > Manager.Resource.monsterDic[0].monsterInfo.attackRange * Manager.Resource.monsterDic[monsterNumber].monsterInfo.attackRange)
         {
-            if (dir.x < 0 && rigid.velocity.x > -Manager.Resource.monsterDic[0].monsterInfo.speed)
-            {
-                rigid.velocity = new Vector2(-Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed, rigid.velocity.y);
-            }
+            rigid.velocity = new Vector2(-Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed, rigid.velocity.y);
             spriteRenderer.flipX = true;
         }
 
-        //공격범위안이지만 공격쿨타임일때
-        if (attackCoolTime > 0 && dir.x > 0 && (player.position - transform.position).sqrMagnitude < Manager.Resource.monsterDic[monsterNumber].monsterInfo.attackRange * Manager.Resource.monsterDic[monsterNumber].monsterInfo.attackRange)
+
+
+        //언덕일때
+        if (attackCoolTime > 0 && dir.x > 0 && isGround && isSlope && slopeCheak < Manager.Resource.monsterDic[monsterNumber].monsterInfo.maxAngle)
         {
-            if (dir.x > 0 && rigid.velocity.x < Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed)
-            {
-                rigid.velocity = new Vector2(Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed, rigid.velocity.y);
-            }
+            rigid.velocity = perp * -1 * Manager.Data.GameData.speed/4;
+            spriteRenderer.flipX = false;
+        }
+        else if (attackCoolTime > 0 && dir.x < 0 && isGround && isSlope && slopeCheak < Manager.Resource.monsterDic[monsterNumber].monsterInfo.maxAngle)
+        {
+            rigid.velocity = perp * Manager.Data.GameData.speed/4;
+            spriteRenderer.flipX = true;
+        }
+        else if (attackCoolTime > 0 && dir.x > 0 && (player.position - transform.position).sqrMagnitude < Manager.Resource.monsterDic[monsterNumber].monsterInfo.attackRange * Manager.Resource.monsterDic[monsterNumber].monsterInfo.attackRange)
+        {
+            rigid.velocity = new Vector2(Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed, rigid.velocity.y);
             spriteRenderer.flipX = false;
         }
         else if (attackCoolTime > 0 && dir.x < 0 && (player.position - transform.position).sqrMagnitude < Manager.Resource.monsterDic[monsterNumber].monsterInfo.attackRange * Manager.Resource.monsterDic[monsterNumber].monsterInfo.attackRange)
         {
-            if (dir.x < 0 && rigid.velocity.x > -Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed)
-            {
-                rigid.velocity = new Vector2(-Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed, rigid.velocity.y);
-            }
+            rigid.velocity = new Vector2(-Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed, rigid.velocity.y);
             spriteRenderer.flipX = true;
         }
+
 
 
 
@@ -164,7 +209,7 @@ public class Monster : MonoBehaviour, IDamagable
             StartCoroutine(JumpCoolTime());
         }
         //플레이어가 아래있고, 탐색가능하고, 발판이있을때
-        else if (isGround && groundCheck.isJump && player.position.y < transform.position.y -1 &&  (player.position - transform.position).sqrMagnitude < Manager.Resource.monsterDic[monsterNumber].monsterInfo.findRange * Manager.Resource.monsterDic[monsterNumber].monsterInfo.findRange)
+        else if (isGround && groundCheck.isJump && player.position.y < transform.position.y - 1 && (player.position - transform.position).sqrMagnitude < Manager.Resource.monsterDic[monsterNumber].monsterInfo.findRange * Manager.Resource.monsterDic[monsterNumber].monsterInfo.findRange)
         {
             ChangeState(State.Jump);
             StartCoroutine(DownJump());
@@ -191,7 +236,7 @@ public class Monster : MonoBehaviour, IDamagable
         //Debug.Log("점프상태");
 
 
-        
+
 
         if ((player.position - transform.position).sqrMagnitude < Manager.Resource.monsterDic[monsterNumber].monsterInfo.findRange * Manager.Resource.monsterDic[monsterNumber].monsterInfo.findRange)
         {
@@ -219,13 +264,14 @@ public class Monster : MonoBehaviour, IDamagable
     private void AttackState()
     {
         //Debug.Log("공격중");
-
+        rigid.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
 
 
         //공격이 끝나면
         if (!isAttacking)
         {
             ChangeState(State.Trace);
+            rigid.constraints = RigidbodyConstraints2D.FreezeRotation;
         }
 
         if (hp <= 0)
@@ -235,6 +281,23 @@ public class Monster : MonoBehaviour, IDamagable
     }
 
 
+
+    private void SlopeChk(RaycastHit2D hit)
+    {
+        //매개변수의 반시계방향으로 90돌아간 벡터를 반환 == 언덕의 평면
+        perp = Vector2.Perpendicular(hit.normal).normalized;
+        //RaycastHit2D의 충돌지점의 법선벡터 nomal과 Vector2.up 사이 각도 == 언덕의 경사도
+        slopeCheak = Vector2.Angle(hit.normal, Vector2.up);
+
+        if (slopeCheak != 0) // 언덕
+        {
+            isSlope = true;
+        }
+        else // 평지
+        {
+            isSlope = false;
+        }
+    }
 
 
     private void DieState()
@@ -247,7 +310,7 @@ public class Monster : MonoBehaviour, IDamagable
     public void TakeDamage(int damage)
     {
         DamageText damageText = Instantiate(damageTextPrifab, damageTextPos.position, damageTextPos.rotation);
-        damageText.damage = damage;
+        damageText.damage = damage; // DamageText damageText에 표시할 데미지 입력
         //Debug.Log("데미지");
         hp -= damage;
     }

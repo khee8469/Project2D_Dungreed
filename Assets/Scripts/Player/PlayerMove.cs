@@ -54,10 +54,10 @@ public class PlayerMove : MonoBehaviour, IDamagable
 
     [Header("Equipment")]
     //[SerializeField] int EquipNumChange;
-    [SerializeField] int curEquipemnt;
     [SerializeField] SpriteRenderer equipmentImage;
-    [SerializeField] float coolTime;
     [SerializeField] InventoryUI inventoryUI;
+    [SerializeField] int curEquipemnt;
+    [SerializeField] float coolTime;
 
 
     State state = State.Idle; // 초기상태
@@ -67,16 +67,20 @@ public class PlayerMove : MonoBehaviour, IDamagable
     Vector3 mousePos;  // 마우스 Z값 조정용
     Vector2 dashNormalized; //대쉬방향
 
+    /*private int cosAngle;
+    public int CosAngle { get { return cosAngle; } set { OnCosAngleSet(value); } }
     
-
-    //MainScene mainScene; // 퍼즈시 업데이트 정지용
+    public void OnCosAngleSet(int angle)
+    {
+        float a = Mathf.Cos(angle * Mathf.Deg2Rad);
+    }*/
 
     public void Awake()
     {
         mousePos = new Vector3(0, 0, 10);
-
         Manager.Pool.CreatePool(jumpEffectPrefab, 2, 4);
         Manager.Pool.CreatePool(runEffectPrefab, 4, 8);
+        inventoryUI = FindObjectOfType<InventoryUI>();
     }
 
     private void Start()
@@ -370,24 +374,6 @@ public class PlayerMove : MonoBehaviour, IDamagable
         }
     }
 
-    private void MoveEffect()
-    {
-        if (moveDir.x < 0)
-        {
-            //먼지이펙트
-
-            effectPos.transform.localScale = new Vector3(1, 1, 1);
-            frontRayPoint.rotation = Quaternion.Euler(0, 180, 0);
-        }
-        else if (moveDir.x > 0)
-        {
-
-            effectPos.transform.localScale = new Vector3(-1, 1, 1);
-            frontRayPoint.rotation = Quaternion.Euler(0, 0, 0);
-        }
-    }
-
-
     //언덕 평면방향, 경사 체크
     private void SlopeChk(RaycastHit2D hit)
     {
@@ -405,6 +391,24 @@ public class PlayerMove : MonoBehaviour, IDamagable
             isSlope = false;
         }
     }
+
+    private void MoveEffect()
+    {
+        if (moveDir.x < 0)
+        {
+            //먼지이펙트
+
+            effectPos.transform.localScale = new Vector3(1, 1, 1);
+            frontRayPoint.rotation = Quaternion.Euler(0, 180, 0);
+        }
+        else if (moveDir.x > 0)
+        {
+
+            effectPos.transform.localScale = new Vector3(-1, 1, 1);
+            frontRayPoint.rotation = Quaternion.Euler(0, 0, 0);
+        }
+    }
+
 
     //이거도 상태로 넣을수 있나?
     private void OnJump(InputValue value)
@@ -493,7 +497,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
             Vector2 curDir = (cursor.position - leftRotate.position).normalized;
             IDamagable monster = colliders[i].GetComponent<IDamagable>();
 
-            if (Vector3.Dot(monDir, curDir) > Manager.Resource.itemDic[inventoryUI.equipmentSlots[curEquipemnt].itemId].itemInfo.cosAngle)
+            if (Vector3.Dot(monDir, curDir) > Mathf.Cos(Manager.Resource.itemDic[inventoryUI.equipmentSlots[curEquipemnt].itemId].itemInfo.angleRange * Mathf.Deg2Rad))
             {
                 monster.TakeDamage(Manager.Resource.itemDic[inventoryUI.equipmentSlots[curEquipemnt].itemId].itemInfo.damage);
             }

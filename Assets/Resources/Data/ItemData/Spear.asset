@@ -21,6 +21,5 @@ MonoBehaviour:
     effectPlayTime: 0.5
     damage: 5
     range: 5
-    cosAngle: 45
-    angleRange: 0
+    angleRange: 45
     coolTime: 1

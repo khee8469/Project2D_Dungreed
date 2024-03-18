@@ -81,7 +81,13 @@ public class PlayerMove : MonoBehaviour, IDamagable
 
     void Update()
     {
+        if (Time.timeScale == 0f) // 일시정지시 마우스이동막기
+        {
+            return;
+        }
+
         Mouse();
+
 
         if (coolTime > 0)
         {
@@ -295,7 +301,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
     private void StartEquipment()
     {
         //무기칸 1번에 데이터 입력
-        inventoryUI.equipmentSlots[0].SlotSet(Manager.Resource.itemDic[0].itemInfo.itemImage, Manager.Resource.itemDic[0].itemInfo.itemType, Manager.Resource.itemDic[0].itemInfo.itemNumber);
+        inventoryUI.equipmentSlots[0].SlotSet(Manager.Resource.itemDic[1].itemInfo.itemImage, Manager.Resource.itemDic[1].itemInfo.itemType, Manager.Resource.itemDic[1].itemInfo.itemNumber);
         // 케릭터 손에 무기이미지 입력
         equipmentImage.sprite = inventoryUI.equipmentSlots[0].slotImage.sprite;
     }
@@ -499,7 +505,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
 
         //좌우로 휘두르는 무기, 찌르는 무기
 
-        if (inventoryUI.equipmentSlots[curEquipemnt].itemId < 2) // 임시 테스트
+        if (inventoryUI.equipmentSlots[curEquipemnt].itemId < 3) // 임시 테스트
         {
             if (!weaponWield)
             {
@@ -513,7 +519,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
             }
         }
 
-        else if (inventoryUI.equipmentSlots[curEquipemnt].itemId >= 2)
+        else if (inventoryUI.equipmentSlots[curEquipemnt].itemId >= 3)
         {
             StartCoroutine(SpearAttack());
         }
@@ -524,9 +530,13 @@ public class PlayerMove : MonoBehaviour, IDamagable
         Vector2 dir = (cursor.position - leftRotate.position).normalized;
         leftRotate.transform.right = dir;
 
-        GameObject abc = Instantiate(Manager.Resource.itemDic[inventoryUI.equipmentSlots[curEquipemnt].itemId].itemInfo.effect,
-            leftRotate.position + (Vector3)(dir * (Manager.Resource.itemDic[inventoryUI.equipmentSlots[curEquipemnt].itemId].itemInfo.range / 2)), leftRotate.rotation);
-        Destroy(abc, Manager.Resource.itemDic[inventoryUI.equipmentSlots[curEquipemnt].itemId].itemInfo.effectPlayTime);
+        if(Manager.Resource.itemDic[inventoryUI.equipmentSlots[curEquipemnt].itemId].itemInfo.itemNumber != 0)
+        {
+            GameObject abc = Instantiate(Manager.Resource.itemDic[inventoryUI.equipmentSlots[curEquipemnt].itemId].itemInfo.effect,
+           leftRotate.position + (Vector3)(dir * (Manager.Resource.itemDic[inventoryUI.equipmentSlots[curEquipemnt].itemId].itemInfo.range / 2)), leftRotate.rotation);
+            Destroy(abc, Manager.Resource.itemDic[inventoryUI.equipmentSlots[curEquipemnt].itemId].itemInfo.effectPlayTime);
+        }
+       
 
         //effectAngle = Mathf.Atan2(cursor.position.y - leftRotate.position.y, cursor.position.x - leftRotate.position.x) * Mathf.Rad2Deg;
         //pooledObject.transform.rotation = Quaternion.AngleAxis(effectAngle, Vector3.forward);//forward(z축 기준)으로 회전

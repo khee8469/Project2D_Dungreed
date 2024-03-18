@@ -15,7 +15,7 @@ MonoBehaviour:
   itemInfo:
     itemImage: {fileID: 21300000, guid: a4e5f5d43f5e95446b5c6502769c9392, type: 3}
     itemType: 0
-    itemNumber: 1
+    itemNumber: 2
     itemName: "\uB871\uC18C\uB4DC"
     effect: {fileID: 2686819939992122431, guid: 274fc5a1aa252734cb324c4099a17935, type: 3}
     effectPlayTime: 0.1

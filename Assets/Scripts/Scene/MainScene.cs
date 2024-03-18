@@ -7,19 +7,16 @@ using UnityEngine.InputSystem;
 public class MainScene : BaseScene
 {
     [SerializeField] PauseUI pauseUIPrefab;
-    //[SerializeField] InventoryUI InventoryUIPrefab;
     [SerializeField] StateUI state;
+    [SerializeField] GameObject inventory;
 
     //public PlayerMove player;
     public HpBar hpBar;
-    //public InventoryUI inventoryUI;
-
+    
 
     private void Start()
     {
-        pauseUIPrefab = FindObjectOfType<PauseUI>();
         hpBar = FindObjectOfType<HpBar>();
-        //inventoryUI = FindObjectOfType<InventoryUI>();
         hpBar.SetHp(Manager.Data.GameData.hp, Manager.Data.GameData.maxHp);
     }
 
@@ -35,16 +32,10 @@ public class MainScene : BaseScene
         {
             Manager.UI.ClosePopUpUI();
         }
-  
-        //isPause = !isPause; // true를 false로 false를 true로
     }
-    /*private void OnDisPause()
-    {
 
-        isPause = !isPause;
-    }*/
 
-    /*private void OnInventoryOpen(InputValue value)
+    private void OnInventoryOpen(InputValue value)
     {
         Debug.Log(inventory.activeSelf);
         if (!inventory.activeSelf)
@@ -58,9 +49,9 @@ public class MainScene : BaseScene
             //inventory.transform.position = new Vector3(1760, 540, 0);
             inventory.gameObject.SetActive(false);
         }
-    }*/
+    }
 
-    /*private void OnStateOpen(InputValue value)
+    private void OnStateOpen(InputValue value)
     {
         //stateOpen = !stateOpen;
         if (!state.gameObject.activeSelf)
@@ -72,7 +63,7 @@ public class MainScene : BaseScene
         {
             state.gameObject.SetActive(false);
         }
-    }*/
+    }
 
 
 

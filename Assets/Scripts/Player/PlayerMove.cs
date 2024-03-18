@@ -32,6 +32,8 @@ public class PlayerMove : MonoBehaviour, IDamagable
     [SerializeField] DamageText damageTextPrifab;
     [SerializeField] Transform damageTextPos;
 
+    [SerializeField] HpBar hpBar;
+
     [Header("LayerMask")]
     [SerializeField] LayerMask groundLayer; // 바닥확인용 레이어
     [SerializeField] LayerMask targetLayer;
@@ -41,16 +43,9 @@ public class PlayerMove : MonoBehaviour, IDamagable
     [SerializeField] bool isGround;
     [SerializeField] bool isDash;
     [SerializeField] bool weaponWield;//공격모션 변환용
-
-    public bool WeaponWield { get { return weaponWield; } set { weaponWield = value; } }
-
+    //public bool WeaponWield { get { return weaponWield; } set { weaponWield = value; } }
     [SerializeField] bool jumping;  // 언덕에서 점프하기용
-
-
-    [Header("AttackRange")]
     [SerializeField] Transform cursor;
-    //[SerializeField] int attackAngle;
-    //public float cosAngle;
 
     [Header("Equipment")]
     //[SerializeField] int EquipNumChange;
@@ -67,13 +62,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
     Vector3 mousePos;  // 마우스 Z값 조정용
     Vector2 dashNormalized; //대쉬방향
 
-    /*private int cosAngle;
-    public int CosAngle { get { return cosAngle; } set { OnCosAngleSet(value); } }
-    
-    public void OnCosAngleSet(int angle)
-    {
-        float a = Mathf.Cos(angle * Mathf.Deg2Rad);
-    }*/
+
 
     public void Awake()
     {
@@ -577,6 +566,8 @@ public class PlayerMove : MonoBehaviour, IDamagable
         leftHand.Translate(Vector2.left * 2.5f);
     }
 
+
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if ((1 << collision.gameObject.layer & itemLayer) != 0)
@@ -585,6 +576,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
             //인벤토리에 공간이있으면 데이터 저장
             if (Manager.Data.InventoryData.AddItemData(item.Image, item.type, item.id))
             {
+                inventoryUI.AddItemImage(item.Image, item.type, item.id);
                 Destroy(item.gameObject);
                 //해당 슬롯 업데이트;
             }
@@ -614,6 +606,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
         DamageText damageText = Instantiate(damageTextPrifab, damageTextPos.position, damageTextPos.rotation);
         damageText.damage = damage;
         Manager.Data.GameData.hp -= damage;
+        hpBar.SetHp(Manager.Data.GameData.hp, Manager.Data.GameData.maxHp);
     }
 
     private void OnDrawGizmosSelected()

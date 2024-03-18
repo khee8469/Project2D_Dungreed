@@ -32,7 +32,7 @@ public class InventoryUI : PopUpUI
     {
         for (int i = 0; i < inventorySlots.Length; i++)
         {
-            if (type != ItemType.Etc && inventorySlots[1].slotState == SlotState.Blank)
+            if (type != ItemType.Etc && inventorySlots[i].slotState == SlotState.Blank)
             {
                 //Slot에있는 Item 에 내가먹은 Item 정보를 넣음
                 inventorySlots[i].SlotSet(Image, type, id);

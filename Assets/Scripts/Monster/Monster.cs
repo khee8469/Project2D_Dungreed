@@ -313,6 +313,7 @@ public class Monster : MonoBehaviour, IDamagable
         damageText.damage = damage; // DamageText damageText에 표시할 데미지 입력
         //Debug.Log("데미지");
         hp -= damage;
+
     }
 
     //애니메이션 이벤트에 실행

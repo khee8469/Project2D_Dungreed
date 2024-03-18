@@ -28,9 +28,6 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
 
     private void Start()
     {
-        slotImage = transform.GetComponentInChildren<Image>();
-        //slotImage = transform.Find("ItemImage").GetComponent<Image>();
-        //inventoryUI = transform.Find("InventoryUI").GetComponent<InventoryUI>();
         inventoryUI = transform.GetComponentInParent<InventoryUI>();
     }
 

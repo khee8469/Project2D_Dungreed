@@ -1,75 +1,54 @@
+using System;
 using System.Collections.Generic;
 using Unity.VisualScripting.Antlr3.Runtime.Misc;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class InventoryUI : PopUpUI
 {
-    //[SerializeField] LayerMask itemLayer;
+    //[SerializeField] GameObject inventoryUI;
+
     [SerializeField] Transform slotParent;
     [SerializeField] Transform equipmentSlotParent;
     [SerializeField] Transform accessorySlotParent;
 
-    public Slot[] slots;  //인벤토리
+
+    public Slot[] inventorySlots;  //인벤토리 슬롯찾은거
     public Slot[] equipmentSlots;
     public Slot[] accessorySlots;
 
 
-    List<ItemInfo> items = new List<ItemInfo>(); // 데이터 저장되어잇는데...
-
-
     private void Awake()
     {
-        /*base.Awake();
-        GetUI<Button>("InventoryExitButton").onClick.AddListener(Close);*/
         //인벤토리 슬롯 전부 찾기
-        slots = slotParent.GetComponentsInChildren<Slot>();
+        inventorySlots = slotParent.GetComponentsInChildren<Slot>();
         equipmentSlots = equipmentSlotParent.GetComponentsInChildren<Slot>();
-        accessorySlots= accessorySlotParent.GetComponentsInChildren<Slot>();
+        accessorySlots = accessorySlotParent.GetComponentsInChildren<Slot>();
     }
 
-    private void Start()
+    public void AddItemImage(Sprite Image, ItemType type, int id)  // 슬롯 데이터 입력
     {
-        
-    }
-
-    //player가 아이템먹으면 실행
-    public bool AddItem(ItemInfo item)
-    {
-        if (item == null)
+        for (int i = 0; i < inventorySlots.Length; i++)
         {
-            return false;
-        }
-        if (items.Count < slots.Length && item.itemType != ItemType.Etc )
-        {
-            items.Add(item);
-            for (int i = 0; i < items.Count; i++)
+            if (type != ItemType.Etc && inventorySlots[1].slotState == SlotState.Blank)
             {
-                if (slots[i].slotState == SlotState.Blank)
-                {
-                    //Debug.Log("데이터 입력");
-                    //Slot에있는 Item 에 내가먹은 Item 정보를 넣음
-                    
-                    slots[i].itemInfo = item;
-                    slots[i].slotState = SlotState.Fill;
-                    slots[i].SlotSetImage();
-                }
+                //Slot에있는 Item 에 내가먹은 Item 정보를 넣음
+                inventorySlots[i].SlotSet(Image, type, id);
+                return;
             }
-            return true;
-        }
-
-        else if (item.itemType == ItemType.Etc)
-        {
-            return true;
-        }
-        return false;
+        }   
     }
 
-
-    public void RemoveItem(int index)
+    public void SlotClear()
     {
-        items.RemoveAt(index);
+        //빈슬롯 데이터 
     }
+
+    /*public void InventoryClose()
+    {
+        inventoryUI.SetActive(false);
+    }*/
 
 }

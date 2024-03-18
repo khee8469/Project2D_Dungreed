@@ -59,6 +59,7 @@ public class SceneManager : Singleton<SceneManager>
             loadingBar.value = oper.progress;
             yield return null;
         }
+;
         //EventSystem 없으면 생성
         Manager.UI.EnsureEventSystem();
         //BaseScene = 현재씬

@@ -17,6 +17,6 @@ public class StartUI : PopUpUI
 
     public void GameLoad()
     {
-        Manager.Scene.LoadScene("MainGame");
+        Manager.Scene.LoadScene("Town");
     }
 }

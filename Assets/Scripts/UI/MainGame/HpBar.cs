@@ -4,21 +4,23 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class HpBar : MonoBehaviour
+public class HpBar : InGameUI
 {
-    [SerializeField] float curHealth; //* 현재 체력
+    float curHealth; //* 현재 체력
     public float maxHealth; //* 최대 체력
     public Slider HpBarSlider;
     public Text text;
 
-    
+    private void Start()
+    {
+        
+    }
 
     public void SetHp(int hp, int max) //처음 Hp설정
     {
         maxHealth = max;
         curHealth = hp;
         CheckHp();
-
         text.text = $"{curHealth.ToString()}/{maxHealth.ToString()}";
     }
 

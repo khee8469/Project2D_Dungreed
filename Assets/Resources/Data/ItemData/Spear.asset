@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9634030270cd7bc48a0d7a9fba960cbb, type: 3}
+  m_Name: Spear
+  m_EditorClassIdentifier: 
+  itemInfo:
+    itemImage: {fileID: 21300000, guid: a3a4af6d4b0b7124eadb31fd2fbfbb04, type: 3}
+    itemType: 0
+    itemNumber: 2
+    itemName: "\uCC3D"
+    effect: {fileID: 4723688529321365910, guid: b3a35c0eec9f15d4187a9a9c793fbcce, type: 3}
+    effectPlayTime: 0.5
+    damage: 5
+    range: 5
+    cosAngle: 45
+    angleRange: 0
+    coolTime: 1

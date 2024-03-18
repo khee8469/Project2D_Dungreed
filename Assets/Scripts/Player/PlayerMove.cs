@@ -19,7 +19,6 @@ public class PlayerMove : MonoBehaviour, IDamagable
     [SerializeField] float slopeCheak;
     [SerializeField] Vector2 perp;
     [SerializeField] bool isSlope;
-    [SerializeField] float maxAngle;
     [SerializeField] Transform frontRayPoint;
     [SerializeField] Transform frontCheak;
 
@@ -47,12 +46,6 @@ public class PlayerMove : MonoBehaviour, IDamagable
 
     [SerializeField] bool jumping;  // 언덕에서 점프하기용
 
-    [Header("PlayerState")]
-    [SerializeField] int hp;
-    [SerializeField] int maxHp;
-    [SerializeField] float speed;
-    [SerializeField] float jumpPower;
-    [SerializeField] float dashPower;
 
     [Header("AttackRange")]
     [SerializeField] Transform cursor;
@@ -64,6 +57,8 @@ public class PlayerMove : MonoBehaviour, IDamagable
     [SerializeField] int curEquipemnt;
     [SerializeField] SpriteRenderer equipmentImage;
     [SerializeField] float coolTime;
+    [SerializeField] InventoryUI inventoryUI;
+
 
     State state = State.Idle; // 초기상태
     Vector2 moveDir;  // 방향입력
@@ -72,7 +67,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
     Vector3 mousePos;  // 마우스 Z값 조정용
     Vector2 dashNormalized; //대쉬방향
 
-
+    
 
     //MainScene mainScene; // 퍼즈시 업데이트 정지용
 
@@ -86,8 +81,6 @@ public class PlayerMove : MonoBehaviour, IDamagable
 
     private void Start()
     {
-        Manager.Game.hpBar.SetHp(hp, maxHp); // hp 설정
-
         StartEquipment(); //시작 장비
     }
 
@@ -123,7 +116,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
                 DieState();
                 break;
         }
-        
+
         EquipmentScrollChange();  // 스크롤로 무기 이미지 변경
     }
 
@@ -183,7 +176,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
             ChangeState(State.Dash);
         }
 
-        if (hp <= 0)
+        if (Manager.Data.GameData.hp <= 0)
         {
             ChangeState(State.Die);
         }
@@ -216,7 +209,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
             ChangeState(State.Dash);
         }
 
-        if (hp <= 0)
+        if (Manager.Data.GameData.hp <= 0)
         {
             ChangeState(State.Die);
 
@@ -227,9 +220,6 @@ public class PlayerMove : MonoBehaviour, IDamagable
     {
         Move(); // 점프상태일때 속도 조절
         //Debug.Log("jump");
-
-
-
 
 
         if (moveDir.x == 0 && isGround && rigid.velocity.y < 0.01f) //점프시 벽에 부딪혀 떨어지는거 방지,
@@ -249,7 +239,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
             ChangeState(State.Dash);
         }
 
-        if (hp <= 0)
+        if (Manager.Data.GameData.hp <= 0)
         {
             ChangeState(State.Die);
         }
@@ -275,7 +265,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
             ChangeState(State.Jump);
         }
 
-        if (hp <= 0)
+        if (Manager.Data.GameData.hp <= 0)
         {
             ChangeState(State.Die);
         }
@@ -300,24 +290,22 @@ public class PlayerMove : MonoBehaviour, IDamagable
     {
         if (curEquipemnt == 0)
         {
-            equipmentImage.sprite = Manager.Game.inventoryUI.equipmentSlots[0].itemInfo.itemImage;
+            equipmentImage.sprite = inventoryUI.equipmentSlots[0].slotImage.sprite;
         }
         else if (curEquipemnt == 1)
         {
-            equipmentImage.sprite = Manager.Game.inventoryUI.equipmentSlots[1].itemInfo.itemImage;
+            equipmentImage.sprite = inventoryUI.equipmentSlots[1].slotImage.sprite;
         }
     }
 
     //시작장비
     private void StartEquipment()
     {
-        Manager.Game.inventoryUI.equipmentSlots[0].itemInfo = Manager.Game.itemDatabase.itemData.itemInfo[0]; // 1번슬롯에 무기 데이터 입력
-        Manager.Game.inventoryUI.equipmentSlots[0].SlotSetImage();  // 1번슬롯에 무기 이미지 입력
-        Manager.Game.inventoryUI.equipmentSlots[0].slotState = SlotState.Fill;  // 1번슬롯 장착상태로 변경
-        equipmentImage.sprite = Manager.Game.inventoryUI.equipmentSlots[0].itemInfo.itemImage;  // 케릭터 손에 무기이미지 입력
+        //무기칸 1번에 데이터 입력
+        inventoryUI.equipmentSlots[0].SlotSet(Manager.Resource.itemDic[0].itemInfo.itemImage, Manager.Resource.itemDic[0].itemInfo.itemType, Manager.Resource.itemDic[0].itemInfo.itemNumber);
+        // 케릭터 손에 무기이미지 입력
+        equipmentImage.sprite = inventoryUI.equipmentSlots[0].slotImage.sprite;
     }
-
-
     private void DieState()
     {
         Debug.Log("죽음");
@@ -335,26 +323,26 @@ public class PlayerMove : MonoBehaviour, IDamagable
         //평지
         if (isGround)
         {
-            if (moveDir.x > 0 && rigid.velocity.x < speed)
+            if (moveDir.x > 0 && rigid.velocity.x < Manager.Data.GameData.speed)
             {
-                rigid.velocity = new Vector2(speed, rigid.velocity.y);
+                rigid.velocity = new Vector2(Manager.Data.GameData.speed, rigid.velocity.y);
             }
-            else if (moveDir.x < 0 && rigid.velocity.x > -speed)
+            else if (moveDir.x < 0 && rigid.velocity.x > -Manager.Data.GameData.speed)
             {
-                rigid.velocity = new Vector2(-speed, rigid.velocity.y);
+                rigid.velocity = new Vector2(-Manager.Data.GameData.speed, rigid.velocity.y);
             }
         }
 
         //점프중일때
         if (!isGround)
         {
-            if (moveDir.x > 0 && rigid.velocity.x < speed)
+            if (moveDir.x > 0 && rigid.velocity.x < Manager.Data.GameData.speed)
             {
-                rigid.AddForce(Vector2.right * speed * 2, ForceMode2D.Force);
+                rigid.AddForce(Vector2.right * Manager.Data.GameData.speed * 2, ForceMode2D.Force);
             }
-            else if (moveDir.x < 0 && rigid.velocity.x > -speed)
+            else if (moveDir.x < 0 && rigid.velocity.x > -Manager.Data.GameData.speed)
             {
-                rigid.AddForce(Vector2.left * speed * 2, ForceMode2D.Force);
+                rigid.AddForce(Vector2.left * Manager.Data.GameData.speed * 2, ForceMode2D.Force);
             }
         }
 
@@ -375,10 +363,10 @@ public class PlayerMove : MonoBehaviour, IDamagable
         Debug.DrawLine(frontCheak.position, frontCheak.position + frontCheak.right, Color.blue);
 
         //언덕일때
-        if (!jumping && isGround && isSlope && slopeCheak < maxAngle)
+        if (!jumping && isGround && isSlope && slopeCheak < Manager.Data.GameData.maxAngle)
         {
             //Perpendicular값이 -x값을 반환하기 때문에 -1을 곱해준다.
-            rigid.velocity = moveDir.x * perp * -1 * speed;
+            rigid.velocity = moveDir.x * perp * -1 * Manager.Data.GameData.speed;
         }
     }
 
@@ -455,7 +443,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
         if (transform.position.x < cursor.position.x)
         {
             //x축 반넘어갔을때 반전시키는 모션
-            if (Manager.Game.inventoryUI.equipmentSlots[0].itemInfo.weaponNumber < 2)
+            if (inventoryUI.equipmentSlots[0].itemId < 2)
             {
                 leftRotate.transform.localScale = new Vector3(1, 1, 1);
             }
@@ -464,38 +452,13 @@ public class PlayerMove : MonoBehaviour, IDamagable
         }
         else if (transform.position.x > cursor.position.x)
         {
-            if (Manager.Game.inventoryUI.equipmentSlots[0].itemInfo.weaponNumber < 2)
+            if (inventoryUI.equipmentSlots[0].itemId < 2)
             {
                 leftRotate.transform.localScale = new Vector3(1, -1, 1);
             }
             //leftFlip.rotation = Quaternion.Euler(0, 0, 0);
             spriteRenderer.flipX = true;
         }
-        /*}
-        else if (curEquipemnt == 1) //1번무기일때
-        {
-        if (transform.position.x < cursor.position.x)
-        {
-            //x축 반넘어갔을때 반전시키는 모션
-            if (Manager.Game.inventoryUI.equipmentSlots[1].itemInfo.weaponNumber < 2)
-            {
-                leftRotate.transform.localScale = new Vector3(1, 1, 1);
-            }
-            //leftFlip.rotation = Quaternion.Euler(180, 0, 0);
-            //플레이어 이미지반전
-            spriteRenderer.flipX = false;
-        }
-        else if (transform.position.x > cursor.position.x)
-        {
-            if (Manager.Game.inventoryUI.equipmentSlots[1].itemInfo.weaponNumber < 2)
-            {
-                leftRotate.transform.localScale = new Vector3(1, -1, 1);
-            }
-            //leftFlip.rotation = Quaternion.Euler(0, 0, 0);
-            spriteRenderer.flipX = true;
-        }
-        }*/
-
 
         //right방향이 마우스방향을 바라보게하기
         Vector2 dir = (cursor.position - leftRotate.position).normalized;
@@ -510,7 +473,8 @@ public class PlayerMove : MonoBehaviour, IDamagable
         {
             Attack();
             AttactEffect();
-            coolTime = Manager.Game.inventoryUI.equipmentSlots[curEquipemnt].itemInfo.coolTime;
+
+            coolTime = Manager.Resource.itemDic[inventoryUI.equipmentSlots[curEquipemnt].itemId].itemInfo.coolTime;
         }
     }
 
@@ -520,7 +484,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
     private void Attack()
     {
         //Debug.Log("공격");
-        int size = Physics2D.OverlapCircleNonAlloc(leftRotate.position, Manager.Game.inventoryUI.equipmentSlots[curEquipemnt].itemInfo.range, colliders, targetLayer);
+        int size = Physics2D.OverlapCircleNonAlloc(leftRotate.position, Manager.Resource.itemDic[inventoryUI.equipmentSlots[curEquipemnt].itemId].itemInfo.range, colliders, targetLayer);
         for (int i = 0; i < size; i++)
         {
             //몬스터방향
@@ -529,18 +493,9 @@ public class PlayerMove : MonoBehaviour, IDamagable
             Vector2 curDir = (cursor.position - leftRotate.position).normalized;
             IDamagable monster = colliders[i].GetComponent<IDamagable>();
 
-            Debug.Log(Manager.Game.inventoryUI.equipmentSlots[curEquipemnt].itemInfo.itemName);
-            if (Vector3.Dot(monDir, curDir) > Manager.Game.inventoryUI.equipmentSlots[curEquipemnt].itemInfo.cosAngle)
+            if (Vector3.Dot(monDir, curDir) > Manager.Resource.itemDic[inventoryUI.equipmentSlots[curEquipemnt].itemId].itemInfo.cosAngle)
             {
-                if (curEquipemnt == 0)
-                {
-                    monster.TakeDamage(Manager.Game.inventoryUI.equipmentSlots[0].itemInfo.damage);
-                }
-                    
-                else if (curEquipemnt == 1)
-                {
-                    monster.TakeDamage(Manager.Game.inventoryUI.equipmentSlots[1].itemInfo.damage);
-                } 
+                monster.TakeDamage(Manager.Resource.itemDic[inventoryUI.equipmentSlots[curEquipemnt].itemId].itemInfo.damage);
             }
         }
     }
@@ -550,49 +505,25 @@ public class PlayerMove : MonoBehaviour, IDamagable
         //Debug.Log("공격효과");
 
         //좌우로 휘두르는 무기, 찌르는 무기
-        if (curEquipemnt == 0)
-        {
-            if (Manager.Game.inventoryUI.equipmentSlots[0].itemInfo.weaponNumber < 2) // 임시 테스트
-            {
-                if (!weaponWield)
-                {
-                    leftFlip.localScale = new Vector3(1, -1, 1);
-                    weaponWield = true;
-                }
-                else if (weaponWield)
-                {
-                    leftFlip.localScale = new Vector3(1, 1, 1);
-                    weaponWield = false;
-                }
-            }
 
-            else if (Manager.Game.inventoryUI.equipmentSlots[0].itemInfo.weaponNumber >= 2)
-            {
-                StartCoroutine(SpearAttack());
-            }
-        }
-        else if (curEquipemnt == 1)
+        if (inventoryUI.equipmentSlots[curEquipemnt].itemId < 2) // 임시 테스트
         {
-            if (Manager.Game.inventoryUI.equipmentSlots[1].itemInfo.weaponNumber < 2) // 임시 테스트
+            if (!weaponWield)
             {
-                if (!weaponWield)
-                {
-                    leftFlip.localScale = new Vector3(1, -1, 1);
-                    weaponWield = true;
-                }
-                else if (weaponWield)
-                {
-                    leftFlip.localScale = new Vector3(1, 1, 1);
-                    weaponWield = false;
-                }
+                leftFlip.localScale = new Vector3(1, -1, 1);
+                weaponWield = true;
             }
-
-            else if (Manager.Game.inventoryUI.equipmentSlots[1].itemInfo.weaponNumber >= 2)
+            else if (weaponWield)
             {
-                StartCoroutine(SpearAttack());
+                leftFlip.localScale = new Vector3(1, 1, 1);
+                weaponWield = false;
             }
         }
 
+        else if (inventoryUI.equipmentSlots[curEquipemnt].itemId >= 2)
+        {
+            StartCoroutine(SpearAttack());
+        }
 
 
         // 이펙트
@@ -600,21 +531,12 @@ public class PlayerMove : MonoBehaviour, IDamagable
         Vector2 dir = (cursor.position - leftRotate.position).normalized;
         leftRotate.transform.right = dir;
 
-        if (curEquipemnt == 0)
-        {
-            GameObject abc = Instantiate(Manager.Game.inventoryUI.equipmentSlots[curEquipemnt].itemInfo.effect, leftRotate.position + (Vector3)(dir * (Manager.Game.inventoryUI.equipmentSlots[curEquipemnt].itemInfo.range / 2)), leftRotate.rotation);
-            Destroy(abc, Manager.Game.inventoryUI.equipmentSlots[curEquipemnt].itemInfo.effectPlayTime);
-        }
-        if (curEquipemnt == 1)
-        {
-            GameObject abc = Instantiate(Manager.Game.inventoryUI.equipmentSlots[curEquipemnt].itemInfo.effect, leftRotate.position + (Vector3)(dir * (Manager.Game.inventoryUI.equipmentSlots[curEquipemnt].itemInfo.range / 2)), leftRotate.rotation);
-            Destroy(abc, Manager.Game.inventoryUI.equipmentSlots[curEquipemnt].itemInfo.effectPlayTime);
-        }
-
+        GameObject abc = Instantiate(Manager.Resource.itemDic[inventoryUI.equipmentSlots[curEquipemnt].itemId].itemInfo.effect,
+            leftRotate.position + (Vector3)(dir * (Manager.Resource.itemDic[inventoryUI.equipmentSlots[curEquipemnt].itemId].itemInfo.range / 2)), leftRotate.rotation);
+        Destroy(abc, Manager.Resource.itemDic[inventoryUI.equipmentSlots[curEquipemnt].itemId].itemInfo.effectPlayTime);
 
         //effectAngle = Mathf.Atan2(cursor.position.y - leftRotate.position.y, cursor.position.x - leftRotate.position.x) * Mathf.Rad2Deg;
         //pooledObject.transform.rotation = Quaternion.AngleAxis(effectAngle, Vector3.forward);//forward(z축 기준)으로 회전
-
     }
 
 
@@ -629,7 +551,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
         dashNormalized = (cursor.position - transform.position).normalized;
 
         ghostTrail.gameObject.SetActive(true);
-        rigid.AddForce(dashNormalized * dashPower, ForceMode2D.Impulse);
+        rigid.AddForce(dashNormalized * Manager.Data.GameData.dashPower, ForceMode2D.Impulse);
         yield return new WaitForSeconds(0.2f);
         ghostTrail.gameObject.SetActive(false);
         rigid.velocity *= 0.3f;
@@ -639,7 +561,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
     IEnumerator JumpOn()
     {
         jumping = true;
-        rigid.velocity = new Vector2(rigid.velocity.x, jumpPower);
+        rigid.velocity = new Vector2(rigid.velocity.x, Manager.Data.GameData.jumpPower);
         yield return new WaitForSeconds(0.1f);
         jumping = false;
     }
@@ -655,10 +577,12 @@ public class PlayerMove : MonoBehaviour, IDamagable
     {
         if ((1 << collision.gameObject.layer & itemLayer) != 0)
         {
-            FieldItems fieldItems = collision.GetComponent<FieldItems>();
-            if (Manager.Game.inventoryUI.AddItem(fieldItems?.item))
+            FieldItems item = collision.GetComponent<FieldItems>();
+            //인벤토리에 공간이있으면 데이터 저장
+            if (Manager.Data.InventoryData.AddItemData(item.Image, item.type, item.id))
             {
-                Destroy(fieldItems.gameObject);
+                Destroy(item.gameObject);
+                //해당 슬롯 업데이트;
             }
         }
     }
@@ -685,14 +609,16 @@ public class PlayerMove : MonoBehaviour, IDamagable
     {
         DamageText damageText = Instantiate(damageTextPrifab, damageTextPos.position, damageTextPos.rotation);
         damageText.damage = damage;
-        hp -= damage;
-        Manager.Game.hpBar.Damage(hp);
+        Manager.Data.GameData.hp -= damage;
     }
 
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(leftRotate.position, Manager.Game.inventoryUI.equipmentSlots[curEquipemnt].itemInfo.range);
+        if(inventoryUI.equipmentSlots[curEquipemnt].itemId > -1) //빈손은 -1로 하자
+        {
+            Gizmos.DrawWireSphere(leftRotate.position, Manager.Resource.itemDic[inventoryUI.equipmentSlots[curEquipemnt].itemId].itemInfo.range);
+        }
         Gizmos.DrawLine(leftRotate.position, cursor.position);
     }
 }

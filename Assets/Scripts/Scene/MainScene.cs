@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -7,12 +8,22 @@ public class MainScene : BaseScene
 {
     [SerializeField] PauseUI pauseUIPrefab;
     //[SerializeField] InventoryUI InventoryUIPrefab;
-
-    [SerializeField] GameObject inventory;
     [SerializeField] StateUI state;
 
-    bool invenOpen;
-    bool stateOpen;
+    //public PlayerMove player;
+    public HpBar hpBar;
+    //public InventoryUI inventoryUI;
+
+
+    private void Start()
+    {
+       // player = FindObjectOfType<PlayerMove>();
+        //hpBar = FindObjectOfType<HpBar>();
+        //inventoryUI = FindObjectOfType<InventoryUI>();
+        hpBar.SetHp(Manager.Data.GameData.hp, Manager.Data.GameData.maxHp);
+    }
+
+
 
     private void OnPause(InputValue value)
     {
@@ -24,8 +35,7 @@ public class MainScene : BaseScene
         {
             Manager.UI.ClosePopUpUI();
         }
-
-        
+  
         //isPause = !isPause; // true를 false로 false를 true로
     }
     /*private void OnDisPause()
@@ -34,10 +44,10 @@ public class MainScene : BaseScene
         isPause = !isPause;
     }*/
 
-    private void OnInventoryOpen(InputValue value)
+    /*private void OnInventoryOpen(InputValue value)
     {
-        invenOpen = !invenOpen;
-        if (invenOpen)
+        Debug.Log(inventory.activeSelf);
+        if (!inventory.activeSelf)
         {
             //inventory.transform.position = new Vector3(960, 540, 0);
             inventory.gameObject.SetActive(true);
@@ -48,12 +58,12 @@ public class MainScene : BaseScene
             //inventory.transform.position = new Vector3(1760, 540, 0);
             inventory.gameObject.SetActive(false);
         }
-    }
+    }*/
 
-    private void OnStateOpen(InputValue value)
+    /*private void OnStateOpen(InputValue value)
     {
-        stateOpen = !stateOpen;
-        if (stateOpen)
+        //stateOpen = !stateOpen;
+        if (!state.gameObject.activeSelf)
         {
             state.gameObject.SetActive(true);
         }
@@ -62,7 +72,7 @@ public class MainScene : BaseScene
         {
             state.gameObject.SetActive(false);
         }
-    }
+    }*/
 
 
 

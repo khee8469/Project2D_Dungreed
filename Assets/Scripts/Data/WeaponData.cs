@@ -7,13 +7,17 @@ using UnityEngine;
 public class WeaponData : ScriptableObject
 {
     //public Item prefab;
-    public WeaponInfo[] weapons;
+    public WeaponInfo weaponInfo;
 
 
     [Serializable]
     public struct WeaponInfo
     {
-        public Weapon weapon;
+        public Sprite weaponImage;
+        //public WeaponType weaponType;
+        public int weaponNumber;
+
+
         public int weaponPos;
         public GameObject effect;
         public float effectPlayTime;

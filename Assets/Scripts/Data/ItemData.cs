@@ -3,26 +3,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum ItemType { Equipment, Assistant, Accessory, Etc }
+public enum ItemType { Equipment, Assistant, Accessory, Etc , Null }
 [CreateAssetMenu(fileName = "ItemData", menuName = "Data/Item")]
 public class ItemData : ScriptableObject
 {
-    public ItemInfo[] itemInfo;
-
-
+    public ItemInfo itemInfo;
 }
-
 [Serializable]
 public class ItemInfo
 {
-    public ItemType itemType;
-    public string itemName;
     public Sprite itemImage;
-
+    public ItemType itemType;
+    public int itemNumber;
 
     [Header("Weapon")]
-    public int weaponNumber;
-    public Vector3 weaponPos;
+    public string itemName;
+    //public Vector3 weaponPos;
     public GameObject effect;
     public float effectPlayTime;
     public int damage;

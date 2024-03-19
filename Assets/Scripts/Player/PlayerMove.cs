@@ -556,7 +556,6 @@ public class PlayerMove : MonoBehaviour, IDamagable
         {
             isDash = true;
         }
-        
     }
 
     IEnumerator DashGravity()

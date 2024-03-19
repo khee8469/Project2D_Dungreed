@@ -49,7 +49,7 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
     {
         slotImage.sprite = null;
         itemType = ItemType.Null;
-        itemId = -1;
+        itemId = 0;
         slotState = SlotState.Blank;
         SetColor(0);
     }
@@ -185,6 +185,11 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
     public void OnEndDrag(PointerEventData eventData)
     {
         //Debug.Log("엔드드래그");
+        if (DragSlot.instance.dragSlot != null && !inventoryUI.overInventory) // 인벤토리 밖이면
+        {
+            Debug.Log("아이템파괴");
+            DragSlot.instance.dragSlot.ClearSlot();
+        }
         DragSlot.instance.DragSlotClear(); //드래그 슬롯 이미지 끄기
     }
 
@@ -192,7 +197,7 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
     {
         if (DragSlot.instance.dragSlot != null) //드래그슬롯이 참조되어있으면
         {
-            //Debug.Log("드롭");
+            Debug.Log("드롭");
             if (slotState != SlotState.Blank)  // 현재위치에 데이터가 있을때
             {
                 //Debug.Log("교체");

@@ -38,7 +38,6 @@ public class InventoryUI : PopUpUI
         if (RectTransformUtility.RectangleContainsScreenPoint(inventoryRect, mousePosition))  
         {
             overInventory = true;
-            Debug.Log("ui¿ß"); 
         }
         else
         {

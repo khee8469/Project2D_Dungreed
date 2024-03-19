@@ -11,7 +11,7 @@ public class GameData
     public int maxHp = 100;
     public int speed = 10;
     public int jumpPower = 20;
-    public int dashPower = 20;
+    public int dashPower = 25;
     public int maxAngle = 60;
 
     public int gold = 0;

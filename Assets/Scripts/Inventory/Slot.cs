@@ -142,7 +142,7 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
 
 
             // 장비한 아이템 뺴기
-            if (slotState == SlotState.Fill && slotKind == SlotKind.Equipment || slotKind == SlotKind.Assistant || slotKind == SlotKind.Accessory)
+            if (slotState == SlotState.Fill && slotKind != SlotKind.Inventory/* && slotKind == SlotKind.Equipment || slotKind == SlotKind.Assistant || slotKind == SlotKind.Accessory*/)
             {
                 Debug.Log(1);
                 for (int i = 0; i < inventoryUI.inventorySlots.Length; i++)

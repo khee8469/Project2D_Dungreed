@@ -156,21 +156,21 @@ public class Monster : MonoBehaviour, IDamagable
             rigid.velocity = perp  * Manager.Data.GameData.speed /4;
             spriteRenderer.flipX = true;
         }
-
+        //평지일때
         else if (dir.x > 0 && (player.position - transform.position).sqrMagnitude > Manager.Resource.monsterDic[monsterNumber].monsterInfo.attackRange * Manager.Resource.monsterDic[monsterNumber].monsterInfo.attackRange)
         {
-            rigid.velocity = new Vector2(Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed, rigid.velocity.y);
+            //rigid.velocity = new Vector2(Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed, rigid.velocity.y);
+            rigid.AddForce(Vector3.right * Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed);
             spriteRenderer.flipX = false;
         }
         else if (dir.x < 0 && (player.position - transform.position).sqrMagnitude > Manager.Resource.monsterDic[0].monsterInfo.attackRange * Manager.Resource.monsterDic[monsterNumber].monsterInfo.attackRange)
         {
-            rigid.velocity = new Vector2(-Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed, rigid.velocity.y);
+            //rigid.velocity = new Vector2(-Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed, rigid.velocity.y);
+            rigid.AddForce(Vector3.left * Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed);
             spriteRenderer.flipX = true;
         }
 
-
-
-        //언덕일때
+        //언덕에서 쿨타임
         if (attackCoolTime > 0 && dir.x > 0 && isGround && isSlope && slopeCheak < Manager.Resource.monsterDic[monsterNumber].monsterInfo.maxAngle)
         {
             rigid.velocity = perp * -1 * Manager.Data.GameData.speed/4;
@@ -181,14 +181,17 @@ public class Monster : MonoBehaviour, IDamagable
             rigid.velocity = perp * Manager.Data.GameData.speed/4;
             spriteRenderer.flipX = true;
         }
+        //평지에서 쿨타임
         else if (attackCoolTime > 0 && dir.x > 0 && (player.position - transform.position).sqrMagnitude < Manager.Resource.monsterDic[monsterNumber].monsterInfo.attackRange * Manager.Resource.monsterDic[monsterNumber].monsterInfo.attackRange)
         {
-            rigid.velocity = new Vector2(Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed, rigid.velocity.y);
+            //rigid.velocity = new Vector2(Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed, rigid.velocity.y);
+            rigid.AddForce(Vector3.right * Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed);
             spriteRenderer.flipX = false;
         }
         else if (attackCoolTime > 0 && dir.x < 0 && (player.position - transform.position).sqrMagnitude < Manager.Resource.monsterDic[monsterNumber].monsterInfo.attackRange * Manager.Resource.monsterDic[monsterNumber].monsterInfo.attackRange)
         {
-            rigid.velocity = new Vector2(-Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed, rigid.velocity.y);
+            //rigid.velocity = new Vector2(-Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed, rigid.velocity.y);
+            rigid.AddForce(Vector3.left * Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed);
             spriteRenderer.flipX = true;
         }
 

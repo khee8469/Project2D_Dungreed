@@ -6,7 +6,6 @@ public class Gate : MonoBehaviour, IInteractable
 {
     public void Interact(PlayerInteractor player)
     {
-        Manager.Scene.LoadScene("Dungeon");
-        Debug.Log("ÁøÀÔ");
+        Manager.Scene.LoadScene("Title");
     }
 }

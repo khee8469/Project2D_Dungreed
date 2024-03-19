@@ -10,7 +10,6 @@ public class PlayerInteractor : MonoBehaviour
     [SerializeField] LayerMask npc;
     [SerializeField] LayerMask gate;
 
-    bool inGATE;
 
     private void OnInteract(InputValue Value)
     {
@@ -19,10 +18,9 @@ public class PlayerInteractor : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collider)
     {
-        if(!inGATE && (1<<collider.gameObject.layer & gate) != 0)
+        if((1<<collider.gameObject.layer & gate) != 0)
         {
             collider.GetComponent<IInteractable>().Interact(this);
-            inGATE = true;
         }
     }
 
@@ -30,13 +28,11 @@ public class PlayerInteractor : MonoBehaviour
     private void NpcInteract()
     {
         int size = Physics2D.OverlapCircleNonAlloc(transform.position, range, colliders, npc);
-        Debug.Log(size);
         for (int i = 0; i < size; i++)
         {
             IInteractable interactable = colliders[i].GetComponent<IInteractable>();
             if (interactable != null)
             {
-                Debug.Log("¹ß°ß");
                 interactable.Interact(this);
                 break;
             }

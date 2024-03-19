@@ -12,7 +12,8 @@ public class MainScene : BaseScene
 
     //public PlayerMove player;
     public HpBar hpBar;
-    
+    bool invenOpen;
+
 
     private void Start()
     {
@@ -38,16 +39,17 @@ public class MainScene : BaseScene
 
     private void OnInventoryOpen(InputValue value)
     {
-        if (!inventory.activeSelf)
+        invenOpen = !invenOpen;
+        if (invenOpen)
         {
-            //inventory.transform.position = new Vector3(960, 540, 0);
-            inventory.gameObject.SetActive(true);
+            inventory.transform.position = new Vector3(1620, 540, 0);
+            //inventory.gameObject.SetActive(true);
         }
 
         else
         {
-            //inventory.transform.position = new Vector3(1760, 540, 0);
-            inventory.gameObject.SetActive(false);
+            inventory.transform.position = new Vector3(2500, 540, 0);
+            //inventory.gameObject.SetActive(false);
         }
     }
 
@@ -65,6 +67,11 @@ public class MainScene : BaseScene
         }
     }
 
+    public void InventoryClose()
+    {
+        inventory.transform.position = new Vector3(2500, 540, 0);
+        invenOpen = false;
+    }
 
 
     public override IEnumerator LoadingRoutine()

@@ -91,10 +91,4 @@ public class InventoryUI : PopUpUI
     {
         //∫ÛΩΩ∑‘ µ•¿Ã≈Õ 
     }
-
-    /*public void InventoryClose()
-    {
-        inventoryUI.SetActive(false);
-    }*/
-
 }

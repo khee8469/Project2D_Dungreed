@@ -20,6 +20,6 @@ MonoBehaviour:
     effect: {fileID: 2686819939992122431, guid: 274fc5a1aa252734cb324c4099a17935, type: 3}
     effectPlayTime: 0.1
     damage: 2
-    range: 2
+    range: 3
     angleRange: 60
     coolTime: 0.5

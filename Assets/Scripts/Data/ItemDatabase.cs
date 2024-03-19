@@ -11,7 +11,7 @@ public class ItemDatabase : MonoBehaviour
     {
         
         //임시 생성
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < fieldItemPos.Length; i++)
         {
             
             GameObject gameObject = Instantiate(fieldItemPrefab, fieldItemPos[i], Quaternion.identity);

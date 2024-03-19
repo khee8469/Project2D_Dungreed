@@ -99,7 +99,7 @@ public class Monster : MonoBehaviour, IDamagable
 
     private void IdleState()
     {
-        Debug.Log("idle");
+        //Debug.Log("idle");
         rigid.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezeRotation;
             
 
@@ -122,7 +122,7 @@ public class Monster : MonoBehaviour, IDamagable
 
     private void TraceState()
     {
-        Debug.Log("trace");
+        //Debug.Log("trace");
         //¾ð´öÃ¼Å©
         RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 0.5f, groundLayer);
         RaycastHit2D frontHit = Physics2D.Raycast(frontCheak.position, frontCheak.right, 0.3f, groundLayer);
@@ -144,7 +144,6 @@ public class Monster : MonoBehaviour, IDamagable
         else
             frontRayPoint.rotation = Quaternion.Euler(0, 180, 0);
 
-        Debug.Log(perp);
 
         //¾ð´öÀÏ¶§
         if (dir.x >0 && isGround && isSlope && slopeCheak < Manager.Resource.monsterDic[monsterNumber].monsterInfo.maxAngle)

@@ -6,19 +6,16 @@ using static UnityEditor.Progress;
 public class InventoryData
 {
     //인벤토리 데이터
-    List<ItemInfo> inventoryItem = new List<ItemInfo>();
+    public List<ItemInfo> inventoryItem = new List<ItemInfo>();
 
 
-    public int inventoryIndex = 15;
-
-
-    public bool AddItemData(Sprite Image, ItemType type, int id)  //인벤토리 데이터 저장
+    /*public bool AddItemData(Sprite Image, ItemType type, int id)  //인벤토리 데이터 저장
     {
         if (Image == null)
         {
             return false;
         }
-        if (inventoryItem.Count < inventoryIndex && type != ItemType.Etc)
+        if (type != ItemType.Etc)
         {
             inventoryItem.Add(Manager.Resource.itemDic[id].itemInfo);
             return true;
@@ -30,7 +27,7 @@ public class InventoryData
             return true;
         }
         return false;
-    }
+    }*/
 
     public void RemoveItem(int index)
     {

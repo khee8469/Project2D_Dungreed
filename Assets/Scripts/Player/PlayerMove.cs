@@ -468,12 +468,9 @@ public class PlayerMove : MonoBehaviour, IDamagable
     private void OnLeftMouse(InputValue value)
     {
         //Debug.Log("마우스클릭");
-        if (coolTime < 0.1f)
+        if (!inventoryUI.overInventory && coolTime < 0.1f)
         {
             Attack();
-            AttactEffect();
-
-            coolTime = Manager.Resource.itemDic[inventoryUI.equipmentSlots[curEquipemnt].itemId].itemInfo.coolTime;
         }
     }
 
@@ -483,19 +480,28 @@ public class PlayerMove : MonoBehaviour, IDamagable
     private void Attack()
     {
         //Debug.Log("공격");
-        int size = Physics2D.OverlapCircleNonAlloc(leftRotate.position, Manager.Resource.itemDic[inventoryUI.equipmentSlots[curEquipemnt].itemId].itemInfo.range, colliders, targetLayer);
-        for (int i = 0; i < size; i++)
+        if (inventoryUI.equipmentSlots[curEquipemnt].itemId > 0) // 맨손이 아닐때
         {
-            //몬스터방향
-            Vector2 monDir = (colliders[i].transform.position - leftRotate.position).normalized;
-            //마우스방향
-            Vector2 curDir = (cursor.position - leftRotate.position).normalized;
-            IDamagable monster = colliders[i].GetComponent<IDamagable>();
-
-            if (Vector3.Dot(monDir, curDir) > Mathf.Cos(Manager.Resource.itemDic[inventoryUI.equipmentSlots[curEquipemnt].itemId].itemInfo.angleRange * Mathf.Deg2Rad))
+            int size = Physics2D.OverlapCircleNonAlloc(leftRotate.position, Manager.Resource.itemDic[inventoryUI.equipmentSlots[curEquipemnt].itemId].itemInfo.range, colliders, targetLayer);
+            for (int i = 0; i < size; i++)
             {
-                monster.TakeDamage(Manager.Resource.itemDic[inventoryUI.equipmentSlots[curEquipemnt].itemId].itemInfo.damage);
+                //몬스터 기준이 발바닥이라 맞는 각도가 중앙기준으로하게
+                Vector3 monDirOffset = colliders[i].transform.position;
+                monDirOffset.y += 0.7f;
+
+                //몬스터방향
+                Vector2 monDir = (monDirOffset - leftRotate.position).normalized;
+                //마우스방향
+                Vector2 curDir = (cursor.position - leftRotate.position).normalized;
+                IDamagable monster = colliders[i].GetComponent<IDamagable>();
+
+                if (Vector3.Dot(monDir, curDir) > Mathf.Cos(Manager.Resource.itemDic[inventoryUI.equipmentSlots[curEquipemnt].itemId].itemInfo.angleRange * Mathf.Deg2Rad))
+                {
+                    monster.TakeDamage(Manager.Resource.itemDic[inventoryUI.equipmentSlots[curEquipemnt].itemId].itemInfo.damage);
+                }
             }
+            AttactEffect();
+            coolTime = Manager.Resource.itemDic[inventoryUI.equipmentSlots[curEquipemnt].itemId].itemInfo.coolTime;
         }
     }
 
@@ -530,13 +536,13 @@ public class PlayerMove : MonoBehaviour, IDamagable
         Vector2 dir = (cursor.position - leftRotate.position).normalized;
         leftRotate.transform.right = dir;
 
-        if(Manager.Resource.itemDic[inventoryUI.equipmentSlots[curEquipemnt].itemId].itemInfo.itemNumber != 0)
+        if (inventoryUI.equipmentSlots[curEquipemnt].itemId > 0)
         {
             GameObject abc = Instantiate(Manager.Resource.itemDic[inventoryUI.equipmentSlots[curEquipemnt].itemId].itemInfo.effect,
            leftRotate.position + (Vector3)(dir * (Manager.Resource.itemDic[inventoryUI.equipmentSlots[curEquipemnt].itemId].itemInfo.range / 2)), leftRotate.rotation);
             Destroy(abc, Manager.Resource.itemDic[inventoryUI.equipmentSlots[curEquipemnt].itemId].itemInfo.effectPlayTime);
         }
-       
+
 
         //effectAngle = Mathf.Atan2(cursor.position.y - leftRotate.position.y, cursor.position.x - leftRotate.position.x) * Mathf.Rad2Deg;
         //pooledObject.transform.rotation = Quaternion.AngleAxis(effectAngle, Vector3.forward);//forward(z축 기준)으로 회전
@@ -546,7 +552,11 @@ public class PlayerMove : MonoBehaviour, IDamagable
     //대쉬
     private void OnRightMouse(InputValue value)
     {
-        isDash = true;
+        if (!inventoryUI.overInventory)
+        {
+            isDash = true;
+        }
+        
     }
 
     IEnumerator DashGravity()
@@ -584,11 +594,9 @@ public class PlayerMove : MonoBehaviour, IDamagable
         {
             FieldItems item = collision.GetComponent<FieldItems>();
             //인벤토리에 공간이있으면 데이터 저장
-            if (Manager.Data.InventoryData.AddItemData(item.Image, item.type, item.id))
+            if (inventoryUI.AddItemData(item.Image, item.type, item.id))
             {
-                inventoryUI.AddItemImage(item.Image, item.type, item.id);
                 Destroy(item.gameObject);
-                //해당 슬롯 업데이트;
             }
         }
     }
@@ -622,7 +630,7 @@ public class PlayerMove : MonoBehaviour, IDamagable
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;
-        if(inventoryUI.equipmentSlots[curEquipemnt].itemId > -1) //빈손은 -1로 하자
+        if (inventoryUI.equipmentSlots[curEquipemnt].itemId > -1) //빈손은 -1로 하자
         {
             Gizmos.DrawWireSphere(leftRotate.position, Manager.Resource.itemDic[inventoryUI.equipmentSlots[curEquipemnt].itemId].itemInfo.range);
         }

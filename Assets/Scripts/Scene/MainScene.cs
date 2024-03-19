@@ -20,6 +20,7 @@ public class MainScene : BaseScene
         hpBar.SetHp(Manager.Data.GameData.hp, Manager.Data.GameData.maxHp);
     }
 
+    
 
 
     private void OnPause(InputValue value)
@@ -37,7 +38,6 @@ public class MainScene : BaseScene
 
     private void OnInventoryOpen(InputValue value)
     {
-        Debug.Log(inventory.activeSelf);
         if (!inventory.activeSelf)
         {
             //inventory.transform.position = new Vector3(960, 540, 0);

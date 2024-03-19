@@ -23,6 +23,8 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
 
     [SerializeField] InventoryUI inventoryUI;
 
+    
+
     /*public UnityEvent spriteChange;
     spriteChange?.Invoke();*/
 

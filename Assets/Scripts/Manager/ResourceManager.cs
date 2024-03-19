@@ -52,14 +52,4 @@ public class ResourceManager : Singleton<ResourceManager>  // 기본 소스데이터들 
             monsterDic.Add(monster.monsterInfo.monsterNumber, monster);
         }
     }
-
-
 }
-
-/*public class Monster
-{
-    public void Die()
-    {
-        Manager.Resource.itemDic["롱소드"];
-    }
-}*/

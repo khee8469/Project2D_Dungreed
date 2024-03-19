@@ -56,7 +56,7 @@ public class SceneManager : Singleton<SceneManager>
         //씬이 로드될떄까지대기
         while (oper.isDone == false)
         {
-            loadingBar.value = oper.progress;
+            loadingBar.value = oper.progress; // 로딩 비율
             yield return null;
         }
 ;

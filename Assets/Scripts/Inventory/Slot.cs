@@ -2,6 +2,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using static UnityEditor.Progress;
 
 public enum SlotState { Blank, Fill }
 public enum SlotKind { Equipment, Assistant, Accessory, Inventory }
@@ -22,6 +23,7 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
     public SlotState slotState;
 
     [SerializeField] InventoryUI inventoryUI;
+    [SerializeField] ItemDestoryUI itemDestoryUI;
 
     
 
@@ -64,13 +66,6 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
 
     }
 
-    /*    public Image slotImage;
-        public ItemType itemType;
-        public int slotId;
-
-        public SlotKind slotKind;
-        public SlotState slotState;*/
-
 
     public void OnPointerClick(PointerEventData eventData)
     {
@@ -79,10 +74,10 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
             //인벤토리에서 장비하기
             if (slotKind == SlotKind.Inventory)
             {
-                //Debug.Log("인벤토리");
+                Debug.Log("인벤토리");
                 if (itemType == ItemType.Equipment)  // 메인 장비
                 {
-                    //Debug.Log("장비");
+                    Debug.Log("장비");
                     if (inventoryUI.equipmentSlots[0].slotState == SlotState.Blank)
                     {
                         inventoryUI.equipmentSlots[0].SlotSet(slotImage.sprite, itemType, itemId);
@@ -108,7 +103,7 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
                 }
                 else if (itemType == ItemType.Assistant)  // 어시스트 장비
                 {
-                    //Debug.Log("2");
+                    Debug.Log("2");
                     if (inventoryUI.equipmentSlots[2].slotState == SlotState.Blank)
                     {
                         inventoryUI.equipmentSlots[2].SlotSet(slotImage.sprite, itemType, itemId);
@@ -132,7 +127,7 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
                 }
                 else if (itemType == ItemType.Accessory)
                 {
-                    //Debug.Log("3");
+                    Debug.Log("3");
                     for (int i = 0; i < inventoryUI.accessorySlots.Length; i++)
                     {
                         if (inventoryUI.accessorySlots[i].slotState == SlotState.Blank)
@@ -149,6 +144,7 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
             // 장비한 아이템 뺴기
             if (slotState == SlotState.Fill && slotKind == SlotKind.Equipment || slotKind == SlotKind.Assistant || slotKind == SlotKind.Accessory)
             {
+                Debug.Log(1);
                 for (int i = 0; i < inventoryUI.inventorySlots.Length; i++)
                 {
                     if (inventoryUI.inventorySlots[i].slotState == SlotState.Blank)
@@ -187,10 +183,17 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
         //Debug.Log("엔드드래그");
         if (DragSlot.instance.dragSlot != null && !inventoryUI.overInventory) // 인벤토리 밖이면
         {
-            Debug.Log("아이템파괴");
-            DragSlot.instance.dragSlot.ClearSlot();
+            //데이터 삭제는 팝업에서
+            DragSlot.instance.slotImage.sprite = null;
+            DragSlot.instance.SetColor(0);
+            Manager.UI.ShowWindowUI(itemDestoryUI); // 팝업 실행
         }
-        DragSlot.instance.DragSlotClear(); //드래그 슬롯 이미지 끄기
+        /*else if (DragSlot.instance.dragSlot != null && inventoryUI.overInventory)
+        {
+            DragSlot.instance.dragSlot.SlotSet(ImageTemp.sprite, typeTemp, idTemp);
+            DragSlot.instance.DragSlotClear(); //드래그 슬롯 이미지 끄기
+        }*/
+        
     }
 
     public void OnDrop(PointerEventData eventData)

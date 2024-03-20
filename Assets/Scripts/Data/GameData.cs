@@ -16,4 +16,10 @@ public class GameData
 
     public int gold = 0;
 
+    //레벨
+    //인벤토리 아이템넘버
+    public List<int> inventoryData = new List<int>();
+
+
+
 }

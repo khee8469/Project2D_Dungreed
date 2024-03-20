@@ -9,7 +9,6 @@ public class SettingButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
 
     public void Click()
     {
-        Debug.Log("¼³Á¤Ã¢");
         Manager.UI.ShowPopUpUI(settingUIPrefab);
     }
 

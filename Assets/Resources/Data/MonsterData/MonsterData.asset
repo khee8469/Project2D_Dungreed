@@ -19,7 +19,7 @@ MonoBehaviour:
     name: "\uC2A4\uCF08\uB808\uD1A4"
     damage: 3
     hp: 100
-    speed: 20
+    speed: 10
     jumpPower: 25
     findRange: 7
     attackRange: 3

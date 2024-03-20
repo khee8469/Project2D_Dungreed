@@ -8,7 +8,7 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - GroundChecker
+  - 
   - Water
   - UI
   - Player
@@ -19,8 +19,8 @@ TagManager:
   - Item
   - Npc
   - Gate
-  - 
-  - 
+  - DonwJumpChecker
+  - JumpChecker
   - 
   - 
   - 

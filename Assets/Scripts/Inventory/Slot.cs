@@ -4,7 +4,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using static UnityEditor.Progress;
 
-public enum SlotState { Blank, Fill }
+public enum SlotState { Blank, Fill }  // 아이템 ID가 -1이나 0 이면 비어있는거로 표기가능
 public enum SlotKind { Equipment, Assistant, Accessory, Inventory }
 
 
@@ -12,7 +12,7 @@ public enum SlotKind { Equipment, Assistant, Accessory, Inventory }
 public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler
 {
     //RectTransformUtility.RectangleContainsScreenPoint ui충돌확인 함수
-
+    public int slotNumber;
 
     //보이는 이미지
     public Image slotImage;
@@ -37,9 +37,9 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
 
 
     //슬롯데이터 입력
-    public void SlotSet(Sprite Image, ItemType type, int id)
+    public void SlotSet(Sprite image, ItemType type, int id)
     {
-        slotImage.sprite = Image;
+        slotImage.sprite = image;
         itemType = type;
         itemId = id;
         slotState = SlotState.Fill;
@@ -71,68 +71,70 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
     {
         if (eventData.button == PointerEventData.InputButton.Right)
         {
-            //인벤토리에서 장비하기
+            //인벤토리에서 클릭
             if (slotKind == SlotKind.Inventory)
             {
-                Debug.Log("인벤토리");
+                //Debug.Log("인벤토리");
                 if (itemType == ItemType.Equipment)  // 메인 장비
                 {
-                    Debug.Log("장비");
-                    if (inventoryUI.equipmentSlots[0].slotState == SlotState.Blank)
+                    //Debug.Log("장비");
+                    if (inventoryUI.slots[0].slotState == SlotState.Blank)
                     {
-                        inventoryUI.equipmentSlots[0].SlotSet(slotImage.sprite, itemType, itemId);
-                        ClearSlot();
-                    }
-                    else if (inventoryUI.equipmentSlots[0].slotState == SlotState.Fill && inventoryUI.equipmentSlots[1].slotState == SlotState.Blank)
-                    {
+                        inventoryUI.slots[0].SlotSet(slotImage.sprite, itemType, itemId);
 
-                        inventoryUI.equipmentSlots[1].SlotSet(slotImage.sprite, itemType, itemId);
+                        
                         ClearSlot();
                     }
-                    else if (inventoryUI.equipmentSlots[0].slotState == SlotState.Fill && inventoryUI.equipmentSlots[1].slotState == SlotState.Fill)// 둘다 차있을때?
+                    else if (inventoryUI.slots[0].slotState == SlotState.Fill && inventoryUI.slots[1].slotState == SlotState.Blank)
+                    {
+                        inventoryUI.slots[1].SlotSet(slotImage.sprite, itemType, itemId);
+
+                        ClearSlot();
+                    }
+                    else if (inventoryUI.slots[0].slotState == SlotState.Fill && inventoryUI.slots[1].slotState == SlotState.Fill)// 둘다 차있을때?
                     {
                         //슬롯 데이터 저장
-                        Image ImageTemp = inventoryUI.equipmentSlots[0].slotImage;
-                        ItemType typeTemp = inventoryUI.equipmentSlots[0].itemType;
-                        int idTemp = inventoryUI.equipmentSlots[0].itemId;
+                        Sprite spriteTemp = inventoryUI.slots[0].slotImage.sprite;
+                        ItemType typeTemp = inventoryUI.slots[0].itemType;
+                        int idTemp = inventoryUI.slots[0].itemId;
+
+
                         //현재 데이터 슬롯에 입력
-                        inventoryUI.equipmentSlots[0].SlotSet(slotImage.sprite, itemType, itemId);
+                        inventoryUI.slots[0].SlotSet(slotImage.sprite, itemType, itemId);
                         //현재 슬롯에 저장한 슬롯데이터 입력
-                        SlotSet(ImageTemp.sprite, typeTemp, idTemp);
+                        SlotSet(spriteTemp, typeTemp, idTemp);
                     }
                 }
                 else if (itemType == ItemType.Assistant)  // 어시스트 장비
                 {
-                    Debug.Log("2");
-                    if (inventoryUI.equipmentSlots[2].slotState == SlotState.Blank)
+                    if (inventoryUI.slots[2].slotState == SlotState.Blank)
                     {
-                        inventoryUI.equipmentSlots[2].SlotSet(slotImage.sprite, itemType, itemId);
+                        inventoryUI.slots[2].SlotSet(slotImage.sprite, itemType, itemId);
                         ClearSlot();
                     }
-                    else if (inventoryUI.equipmentSlots[2].slotState == SlotState.Fill && inventoryUI.equipmentSlots[3].slotState == SlotState.Blank)
+                    else if (inventoryUI.slots[2].slotState == SlotState.Fill && inventoryUI.slots[3].slotState == SlotState.Blank)
                     {
-                        inventoryUI.equipmentSlots[3].SlotSet(slotImage.sprite, itemType, itemId);
+                        inventoryUI.slots[3].SlotSet(slotImage.sprite, itemType, itemId);
                         ClearSlot();
                     }
                     else // 둘다 차있을때?
                     {
-                        Image ImageTemp = inventoryUI.equipmentSlots[2].slotImage;
-                        ItemType typeTemp = inventoryUI.equipmentSlots[2].itemType;
-                        int idTemp = inventoryUI.equipmentSlots[2].itemId;
+                        Sprite ImageTemp = inventoryUI.slots[2].slotImage.sprite;
+                        ItemType typeTemp = inventoryUI.slots[2].itemType;
+                        int idTemp = inventoryUI.slots[2].itemId;
                         //현재 데이터 슬롯에 입력
-                        inventoryUI.equipmentSlots[2].SlotSet(slotImage.sprite, itemType, itemId);
+                        inventoryUI.slots[2].SlotSet(slotImage.sprite, itemType, itemId);
                         //현재 슬롯에 저장한 슬롯데이터 입력
-                        SlotSet(ImageTemp.sprite, typeTemp, idTemp);
+                        SlotSet(ImageTemp, typeTemp, idTemp);
                     }
                 }
                 else if (itemType == ItemType.Accessory)
                 {
-                    Debug.Log("3");
-                    for (int i = 0; i < inventoryUI.accessorySlots.Length; i++)
+                    for (int i = 4; i < inventoryUI.slots.Length-19; i++)
                     {
-                        if (inventoryUI.accessorySlots[i].slotState == SlotState.Blank)
+                        if (inventoryUI.slots[i].slotState == SlotState.Blank)
                         {
-                            inventoryUI.accessorySlots[i].SlotSet(slotImage.sprite, itemType, itemId);
+                            inventoryUI.slots[i].SlotSet(slotImage.sprite, itemType, itemId);
                             ClearSlot();
                             return;
                         }
@@ -140,17 +142,15 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
                 }
             }
 
-
             // 장비한 아이템 뺴기
-            if (slotState == SlotState.Fill && slotKind != SlotKind.Inventory/* && slotKind == SlotKind.Equipment || slotKind == SlotKind.Assistant || slotKind == SlotKind.Accessory*/)
+            if (slotState == SlotState.Fill && slotKind != SlotKind.Inventory)
             {
-                Debug.Log(1);
-                for (int i = 0; i < inventoryUI.inventorySlots.Length; i++)
+                for (int i = 8; i < inventoryUI.slots.Length-8; i++)
                 {
-                    if (inventoryUI.inventorySlots[i].slotState == SlotState.Blank)
+                    if (inventoryUI.slots[i].slotState == SlotState.Blank)
                     {
                         //Debug.Log("데이터 입력");
-                        inventoryUI.inventorySlots[i].SlotSet(slotImage.sprite, itemType, itemId);
+                        inventoryUI.slots[i].SlotSet(slotImage.sprite, itemType, itemId);
                         ClearSlot();
                         return;
                     }
@@ -188,31 +188,31 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
             DragSlot.instance.SetColor(0);
             Manager.UI.ShowWindowUI(itemDestoryUI); // 팝업 실행
         }
-        /*else if (DragSlot.instance.dragSlot != null && inventoryUI.overInventory)
+        /*else if (DragSlot.instance.dragSlot != null && inventoryUI.overInventory) // 인벤토리 안
         {
-            DragSlot.instance.dragSlot.SlotSet(ImageTemp.sprite, typeTemp, idTemp);
+            DragSlot.instance.dragSlot.SlotSet(slotImage.sprite, itemType, itemId);//원래슬롯 이미지 복구
             DragSlot.instance.DragSlotClear(); //드래그 슬롯 이미지 끄기
         }*/
-        
+
     }
 
     public void OnDrop(PointerEventData eventData)
     {
         if (DragSlot.instance.dragSlot != null) //드래그슬롯이 참조되어있으면
         {
+            Image ImageTemp = slotImage;
+            ItemType typeTemp = itemType;
+            int idTemp = itemId;
             Debug.Log("드롭");
             if (slotState != SlotState.Blank)  // 현재위치에 데이터가 있을때
             {
                 //Debug.Log("교체");
-                Image ImageTemp = slotImage;
-                ItemType typeTemp = itemType;
-                int idTemp = itemId;
-
                 //현재위치 데이터 이미지 입력
                 SlotSet(DragSlot.instance.dragSlot.slotImage.sprite, DragSlot.instance.dragSlot.itemType, DragSlot.instance.dragSlot.itemId);
 
                 //처음위치 데이터 이미지 입력
                 DragSlot.instance.dragSlot.SlotSet(ImageTemp.sprite, typeTemp, idTemp);
+                DragSlot.instance.DragSlotClear();
             }
             else if (slotState == SlotState.Blank)  // 현재위치에 데이터가 없을때
             {
@@ -222,6 +222,11 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
 
                 //과거위치에 데이터 삭제
                 DragSlot.instance.dragSlot.ClearSlot();
+            }
+            else // 슬롯위가 아닌 인벤토리
+            {
+                DragSlot.instance.dragSlot.SlotSet(ImageTemp.sprite, typeTemp, idTemp);
+                DragSlot.instance.DragSlotClear();
             }
         }
     }

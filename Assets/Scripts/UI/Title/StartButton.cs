@@ -9,6 +9,11 @@ public class StartButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     public void Click()
     {
+        if(startUIPrefab == null)
+        {
+            Debug.Log(startUIPrefab);
+            return;
+        }
         Manager.UI.ShowPopUpUI(startUIPrefab);
     }
 

@@ -11,12 +11,8 @@ public class HpBar : InGameUI
     public Slider HpBarSlider;
     public Text text;
 
-    private void Start()
-    {
-        
-    }
 
-    public void SetHp(int hp, int max) //처음 Hp설정
+    public void SetHp(int hp, int max) //메인씬에서 실행
     {
         maxHealth = max;
         curHealth = hp;

@@ -1,17 +1,14 @@
 using System;
 using System.IO;
 using UnityEngine;
+using UnityEngine.Events;
 
 
 //게임 데이터저장용
 public class DataManager : Singleton<DataManager>
 {
-    private GameData gameData = new GameData();  // 저장기능 없을떄 임시용
+    private GameData gameData;
     public GameData GameData { get { return gameData; } }
-
-    private InventoryData inventoryData = new InventoryData();
-    public InventoryData InventoryData { get { return inventoryData; } }
-
 
 #if UNITY_EDITOR          //결합된 경로를 생성
     private string path => Path.Combine(Application.dataPath, $"Resources/Data/SaveLoad");
@@ -61,5 +58,20 @@ public class DataManager : Singleton<DataManager>
     public bool ExistData(int index = 0)
     {
         return File.Exists($"{path}/{index}.txt");
+    }
+
+
+    private void Start()
+    {
+        LoadData(0);
+        LoadData(1);
+        LoadData(2);
+    }
+
+    private void OnDestroy()
+    {
+        //SaveData(0);
+        //SaveData(1);
+        //SaveData(2);
     }
 }

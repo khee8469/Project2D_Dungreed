@@ -22,7 +22,8 @@ public class Monster : MonoBehaviour, IDamagable
     [SerializeField] Rigidbody2D rigid;
     [SerializeField] SpriteRenderer spriteRenderer;
     [SerializeField] Animator animator;
-    [SerializeField] FindGround groundCheck;
+    [SerializeField] JumpChecker jumpCheck;
+    [SerializeField] DownJumpChecker downJumpCheck;
 
     [Header("Slope")]
     [SerializeField] LayerMask groundLayer;
@@ -159,14 +160,22 @@ public class Monster : MonoBehaviour, IDamagable
         //평지일때
         else if (dir.x > 0 && (player.position - transform.position).sqrMagnitude > Manager.Resource.monsterDic[monsterNumber].monsterInfo.attackRange * Manager.Resource.monsterDic[monsterNumber].monsterInfo.attackRange)
         {
+            if(rigid.velocity.x < 3)
+            {
+                rigid.AddForce(Vector3.right * Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed);
+            }
             //rigid.velocity = new Vector2(Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed, rigid.velocity.y);
-            rigid.AddForce(Vector3.right * Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed);
+            
             spriteRenderer.flipX = false;
         }
         else if (dir.x < 0 && (player.position - transform.position).sqrMagnitude > Manager.Resource.monsterDic[0].monsterInfo.attackRange * Manager.Resource.monsterDic[monsterNumber].monsterInfo.attackRange)
         {
             //rigid.velocity = new Vector2(-Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed, rigid.velocity.y);
-            rigid.AddForce(Vector3.left * Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed);
+            
+            if (rigid.velocity.x > -3)
+            {
+                rigid.AddForce(Vector3.left * Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed);
+            }
             spriteRenderer.flipX = true;
         }
 
@@ -185,13 +194,19 @@ public class Monster : MonoBehaviour, IDamagable
         else if (attackCoolTime > 0 && dir.x > 0 && (player.position - transform.position).sqrMagnitude < Manager.Resource.monsterDic[monsterNumber].monsterInfo.attackRange * Manager.Resource.monsterDic[monsterNumber].monsterInfo.attackRange)
         {
             //rigid.velocity = new Vector2(Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed, rigid.velocity.y);
-            rigid.AddForce(Vector3.right * Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed);
+            if (rigid.velocity.x < 3)
+            {
+                rigid.AddForce(Vector3.right * Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed);
+            }
             spriteRenderer.flipX = false;
         }
         else if (attackCoolTime > 0 && dir.x < 0 && (player.position - transform.position).sqrMagnitude < Manager.Resource.monsterDic[monsterNumber].monsterInfo.attackRange * Manager.Resource.monsterDic[monsterNumber].monsterInfo.attackRange)
         {
             //rigid.velocity = new Vector2(-Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed, rigid.velocity.y);
-            rigid.AddForce(Vector3.left * Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed);
+            if (rigid.velocity.x > -3)
+            {
+                rigid.AddForce(Vector3.left * Manager.Resource.monsterDic[monsterNumber].monsterInfo.speed);
+            }
             spriteRenderer.flipX = true;
         }
 
@@ -205,13 +220,13 @@ public class Monster : MonoBehaviour, IDamagable
         }
 
         //플레이어가 위에있고, 탐색가능하고, 발판이있을때
-        if (!isJump && isGround && groundCheck.isJump && player.position.y > transform.position.y + 1 && (player.position - transform.position).sqrMagnitude < Manager.Resource.monsterDic[monsterNumber].monsterInfo.findRange * Manager.Resource.monsterDic[monsterNumber].monsterInfo.findRange)
+        if (!isJump && isGround && jumpCheck.isJump && player.position.y > transform.position.y + 1 && (player.position - transform.position).sqrMagnitude < Manager.Resource.monsterDic[monsterNumber].monsterInfo.findRange * Manager.Resource.monsterDic[monsterNumber].monsterInfo.findRange)
         {
             ChangeState(State.Jump);
             StartCoroutine(JumpCoolTime());
         }
         //플레이어가 아래있고, 탐색가능하고, 발판이있을때
-        else if (isGround && groundCheck.isJump && player.position.y < transform.position.y - 1 && (player.position - transform.position).sqrMagnitude < Manager.Resource.monsterDic[monsterNumber].monsterInfo.findRange * Manager.Resource.monsterDic[monsterNumber].monsterInfo.findRange)
+        else if (isGround && downJumpCheck.isDownJump && player.position.y < transform.position.y - 1 && (player.position - transform.position).sqrMagnitude < Manager.Resource.monsterDic[monsterNumber].monsterInfo.findRange * Manager.Resource.monsterDic[monsterNumber].monsterInfo.findRange)
         {
             ChangeState(State.Jump);
             StartCoroutine(DownJump());

@@ -14,7 +14,7 @@ public class ItemDestoryUI : WindowUI
         base.Awake();
         //SettingExitButton버튼 클릭시 Close 함수 발동하게 설정
         GetUI<Button>("YesButton").onClick.AddListener(ItemDestory);
-        GetUI<Button>("NoButton").onClick.AddListener(Close);
+        GetUI<Button>("NoButton").onClick.AddListener(CloseUI);
     }
     private void ItemDestory()
     {

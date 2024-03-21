@@ -58,7 +58,7 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
 
 
     //투명도 조절
-    private void SetColor(float alpha)
+    public void SetColor(float alpha)
     {
         Color color = slotImage.color;
         color.a = alpha;

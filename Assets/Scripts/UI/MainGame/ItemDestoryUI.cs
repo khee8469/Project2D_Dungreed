@@ -21,4 +21,10 @@ public class ItemDestoryUI : WindowUI
         DragSlot.instance.dragSlot.ClearSlot();
         Close();
     }
+
+    private void CloseUI()
+    {
+        Manager.UI.CloseWindowUI(this);
+        DragSlot.instance.dragSlot.SetColor(1);
+    }
 }

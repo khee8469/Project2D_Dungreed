@@ -13,7 +13,7 @@ public class InventoryUI : PopUpUI
     [SerializeField] RectTransform inventoryRect;
     public bool overInventory;
 
-    [SerializeField] SpriteRenderer equipmentImage;
+    [SerializeField] SpriteRenderer equipmentImage;  // 초반무기 이미지
     [SerializeField] InventoryUI inventoryUI;
 
 
@@ -26,9 +26,9 @@ public class InventoryUI : PopUpUI
     private void Start()
     {
         Debug.Log("초기데이터 저장");
-        if (Manager.Data.GameData.inventoryData.Count < 1) //리스트에 초기값 -1 넣기
+        if (Manager.Data.GameData.inventoryData.Count < 1) //최초에 초기값 -1 넣기
         {
-            Manager.Data.GameData.inventoryData = new List<int>();
+            //Manager.Data.GameData.inventoryData = new List<int>();
 
             Manager.Data.GameData.inventoryData.Add(1);
             //무기칸 1번에 데이터 입력
@@ -46,7 +46,7 @@ public class InventoryUI : PopUpUI
             Debug.Log("인벤데이터 로드");
             for (int i = 0; i < 23; i++)
             {
-                if (Manager.Data.GameData.inventoryData[i] != -1) //세이브데이터로 이미지 입력
+                if (Manager.Data.GameData.inventoryData[i] != 0) //세이브데이터로 이미지 입력
                 {
                     int itemID = Manager.Data.GameData.inventoryData[i];
 
@@ -126,9 +126,9 @@ public class InventoryUI : PopUpUI
     {
         for (int i = 0; i < 23; i++)
         {
-            if (slots[i].itemId == 0)
+            /*if (slots[i].itemId == 0)
                 Manager.Data.GameData.inventoryData[i] = 0;
-            else
+            else*/
                 Manager.Data.GameData.inventoryData[i] = slots[i].itemId;
         }
     }

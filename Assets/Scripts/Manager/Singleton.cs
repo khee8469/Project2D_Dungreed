@@ -7,7 +7,6 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
 
     protected virtual void Awake()
     {
-        Debug.Log(1);
         if (instance == null)
         {
             instance = this as T;

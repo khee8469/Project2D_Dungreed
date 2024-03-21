@@ -75,7 +75,7 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
             if (slotKind == SlotKind.Inventory)
             {
                 //Debug.Log("인벤토리");
-                if (itemType == ItemType.Equipment)  // 메인 장비
+                if (itemType == ItemType.Equipment && itemId != 0)  // 메인 장비
                 {
                     //Debug.Log("장비");
                     if (inventoryUI.slots[0].slotState == SlotState.Blank)
@@ -180,13 +180,20 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        //Debug.Log("엔드드래그");
+        Debug.Log("엔드드래그");
         if (DragSlot.instance.dragSlot != null && !inventoryUI.overInventory) // 인벤토리 밖이면
         {
             //데이터 삭제는 팝업에서
             DragSlot.instance.slotImage.sprite = null;
             DragSlot.instance.SetColor(0);
             Manager.UI.ShowWindowUI(itemDestoryUI); // 팝업 실행
+        }
+        else if (DragSlot.instance.dragSlot != null && inventoryUI.overInventory)
+        {
+            Debug.Log(5);
+            DragSlot.instance.slotImage.sprite = null;
+            DragSlot.instance.SetColor(0);
+            DragSlot.instance.dragSlot.SetColor(1);
         }
         /*else if (DragSlot.instance.dragSlot != null && inventoryUI.overInventory) // 인벤토리 안
         {
@@ -200,10 +207,11 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
     {
         if (DragSlot.instance.dragSlot != null) //드래그슬롯이 참조되어있으면
         {
-            Image ImageTemp = slotImage;
+            Debug.Log(inventoryUI.overInventory);
+            Sprite ImageTemp = slotImage.sprite;
             ItemType typeTemp = itemType;
             int idTemp = itemId;
-            Debug.Log("드롭");
+
             if (slotState != SlotState.Blank)  // 현재위치에 데이터가 있을때
             {
                 //Debug.Log("교체");
@@ -211,7 +219,7 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
                 SlotSet(DragSlot.instance.dragSlot.slotImage.sprite, DragSlot.instance.dragSlot.itemType, DragSlot.instance.dragSlot.itemId);
 
                 //처음위치 데이터 이미지 입력
-                DragSlot.instance.dragSlot.SlotSet(ImageTemp.sprite, typeTemp, idTemp);
+                DragSlot.instance.dragSlot.SlotSet(ImageTemp, typeTemp, idTemp);
                 DragSlot.instance.DragSlotClear();
             }
             else if (slotState == SlotState.Blank)  // 현재위치에 데이터가 없을때
@@ -219,13 +227,8 @@ public class Slot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDra
                 //Debug.Log("이동");
                 //현재위치에 데이터 입력
                 SlotSet(DragSlot.instance.dragSlot.slotImage.sprite, DragSlot.instance.dragSlot.itemType, DragSlot.instance.dragSlot.itemId);
-
                 //과거위치에 데이터 삭제
                 DragSlot.instance.dragSlot.ClearSlot();
-            }
-            else // 슬롯위가 아닌 인벤토리
-            {
-                DragSlot.instance.dragSlot.SlotSet(ImageTemp.sprite, typeTemp, idTemp);
                 DragSlot.instance.DragSlotClear();
             }
         }

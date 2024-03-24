@@ -17,7 +17,7 @@ public class GameData
     public int gold = 0;
 
     //레벨
-    //인벤토리 아이템넘버
+    //인벤토리 슬롯위치에 아이템 넘버 저장
     public List<int> inventoryData = new List<int>();
 
 

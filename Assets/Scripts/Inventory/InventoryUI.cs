@@ -25,7 +25,7 @@ public class InventoryUI : PopUpUI
 
     private void Start()
     {
-        Debug.Log("초기데이터 저장");
+        //Debug.Log("초기데이터 저장");
         if (Manager.Data.GameData.inventoryData.Count < 1) //최초에 초기값 -1 넣기
         {
             //Manager.Data.GameData.inventoryData = new List<int>();
